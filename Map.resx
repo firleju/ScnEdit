@@ -297,6 +297,47 @@
   <data name="FindBox.Size" type="System.Drawing.Size, System.Drawing">
     <value>200, 25</value>
   </data>
+  <data name="ShowWidthButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        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
+</value>
+  </data>
+  <data name="ShowWidthButton.ImageTransparentColor" type="System.Drawing.Color, System.Drawing">
+    <value>Magenta</value>
+  </data>
+  <data name="ShowWidthButton.Size" type="System.Drawing.Size, System.Drawing">
+    <value>23, 22</value>
+  </data>
+  <data name="ShowWidthButton.Text" xml:space="preserve">
+    <value>ShowWidth</value>
+  </data>
   <data name="MapToolStrip.Location" type="System.Drawing.Point, System.Drawing">
     <value>0, 0</value>
   </data>
@@ -445,16 +486,22 @@
   <data name="&gt;&gt;ShowDotsButton.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;FindButton.Name" xml:space="preserve">
+    <value>FindButton</value>
+  </data>
+  <data name="&gt;&gt;FindButton.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;FindBox.Name" xml:space="preserve">
     <value>FindBox</value>
   </data>
   <data name="&gt;&gt;FindBox.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripTextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;FindButton.Name" xml:space="preserve">
-    <value>FindButton</value>
+  <data name="&gt;&gt;ShowWidthButton.Name" xml:space="preserve">
+    <value>ShowWidthButton</value>
   </data>
-  <data name="&gt;&gt;FindButton.Type" xml:space="preserve">
+  <data name="&gt;&gt;ShowWidthButton.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripButton, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">

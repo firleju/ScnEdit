@@ -230,3 +230,5 @@ $RECYCLE.BIN/
 *.msi
 *.msm
 *.msp
+
+\.vs/Trax/v15/Server/sqlite3/

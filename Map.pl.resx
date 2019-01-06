@@ -129,11 +129,11 @@
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="ResetViewButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACkSURBVDhPrZFRCoQwDEQ9W88m/e9h7Y8srlOcMI3JsqCF
-        wZjOm2qz9N6PSJ99W5droY480AgopUyqtY5NgITR8740AGJIBkNhQGvNQC8fhN4UQIOeTuke/eiPADa9
-        MYLxrrXdcAZorft42qR+jSmTwViPAgj7T/z7FxTwsALa0/qdMbJBg4IqhSH0bgGUBnmQSgMI45L0kr3P
-        AiLZmM7FkLv68QVYnemYn5HeiwAAAABJRU5ErkJggg==
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        wwAADsMBx2+oZAAAAKRJREFUOE+tkVEKhDAMRD1bzyb972HtjyyuU5wwjcmyoIXBmM6barP03o9In31b
+        l2uhjjzQCCilTKq1jk2AhNHzvjQAYkgGQ2FAa81ALx+E3hRAg55O6R796I8ANr0xgvGutd1wBmit+3ja
+        pH6NKZPBWI8CCPtP/PsXFPCwAtrT+p0xskGDgiqFIfRuAZQGeZBKAwjjkvSSvc8CItmYzsWQu/rxBVid
+        6Zifkd6LAAAAAElFTkSuQmCC
 </value>
   </data>
   <data name="ResetViewButton.Text" xml:space="preserve">
@@ -141,9 +141,9 @@
   </data>
   <data name="ShowGridButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABISURBVDhPrY5BCgAwCMP6Nv//pw13cvRiq4GCuQRxBiDJ
-        IyLkUaDSdQo4vveBOgpUuk4Bx/c+UEeBStcp4PjeB+q+gMsLzAAu7BeZ1z3bhksAAAAASUVORK5CYII=
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        wwAADsMBx2+oZAAAAEhJREFUOE+tjkEKADAIw/o2//+nDXdy9GKrgYK5BHEGIMkjIuRRoNJ1Cji+94E6
+        ClS6TgHH9z5QR4FK1yng+N4H6r6AywvMAC7sF5nXPduGSwAAAABJRU5ErkJggg==
 </value>
   </data>
   <data name="ShowGridButton.Text" xml:space="preserve">
@@ -151,12 +151,12 @@
   </data>
   <data name="ShowDotsButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAD5SURBVDhPYyAW2Nvbczg6OgYB8QwnJ6fbQPwAyF4ClcYN
-        gBplgIrbgfRbBweHXUB2OpCtApVGgP///zsAcQMM//z5s6Wnp2cBSCNQUx8QS0OVYgKo5gMtLS1P3dzc
-        vnl4eHyPj4//fffu3VdnzpwJgyrDDUA2gjQDbfmPjEFiIDmoMtwApAhkM7oBIDH6GVBfX/8J3QCivXDv
-        3j2/y5cv/wIa8gJkKwhDNR8AYgeoMtwAmCBAgbgRZBsaJqw5NDSU2dbW9gkwvjWgQqQBYOpyB+JjUC7p
-        AOj8KUBcAuWSDoChfR+ItaBc0gHI/1AmeQBo+0IokwzAwAAAIWK9kTclNPAAAAAASUVORK5CYII=
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        wwAADsMBx2+oZAAAAPlJREFUOE9jIBbY29tzODo6BgHxDCcnp9tA/ADIXgKVxg2AGmWAituB9FsHB4dd
+        QHY6kK0ClUaA////OwBxAwz//PmzpaenZwFII1BTHxBLQ5ViAqjmAy0tLU/d3Ny+eXh4fI+Pj/999+7d
+        V2fOnAmDKsMNQDaCNANt+Y+MQWIgOagy3ACkCGQzugEgMfoZUF9f/wndAKK9cO/ePb/Lly//AhryAmQr
+        CEM1HwBiB6gy3ACYIECBuBFkGxomrDk0NJTZ1tb2CTC+NaBCpAFg6nIH4mNQLukA6PwpQFwC5ZIOgKF9
+        H4i1oFzSAcj/UCZ5AGj7QiiTDMDAAAAhYr2RNyU08AAAAABJRU5ErkJggg==
 </value>
   </data>
   <data name="ShowDotsButton.Text" xml:space="preserve">
@@ -164,16 +164,18 @@
   </data>
   <data name="SelectButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEESURBVDhPjZExboNAEEVpc5HcwS09Ulp6Cnd0PoHFKbgF
-        PT09t0BCSgQrhJNd+41mJGxD4Etfs8P+/3d2iQx/t/EKnXPBaN9Usg0zNk0jxjiOpVq/G4IAMca6rkOe
-        51Lp+b4bwCkQU9d1sqbS255K14GA0ziZdZZlEkBv11HpOuwUmwATIW3bHpvg9Q2oMEkSCfG/7uK9/1D5
-        O9b+wpJVVYX+x4XdEAt6DYBlWYb+ewh+mj7Vso6tAFgURRjGxyTzfFL5OywAcZqmsl7+TmO4TV9qeQab
-        mKncnQCC6P99AwNCG5NqUxDm5/Gssm2IWR8Kw3IK2dubYvnKiDExlfHQFMcRRXfFB59iR0k/RQAAAABJ
-        RU5ErkJggg==
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        wwAADsMBx2+oZAAAAQRJREFUOE+NkTFug0AQRWlzkdzBLT1SWnoKd3Q+gcUpuAU9PT23QEJKBCuEk137
+        jWYkbEPgS1+zw/7/d3aJDH+38Qqdc8Fo31SyDTM2TSPGOI6lWr8bggAxxrquQ57nUun5vhvAKRBT13Wy
+        ptLbnkrXgYDTOJl1lmUSQG/XUek67BSbABMhbdsem+D1DagwSRIJ8b/u4r3/UPk71v7CklVVhf7Hhd0Q
+        C3oNgGVZhv57CH6aPtWyjq0AWBRFGMbHJPN8Uvk7LABxmqayXv5OY7hNX2p5BpuYqdydAILo/30DA0Ib
+        k2pTEObn8ayybYhZHwrDcgrZ25ti+cqIMTGV8dAUxxFFd8UHn2JHST9FAAAAAElFTkSuQmCC
 </value>
   </data>
   <data name="SelectButton.Text" xml:space="preserve">
     <value>Tryb zaznaczania</value>
+  </data>
+  <data name="ShowWidthButton.Text" xml:space="preserve">
+    <value>Pokazuj szerokość toru</value>
   </data>
 </root>

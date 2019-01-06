@@ -77,5 +77,11 @@ namespace Trax {
             if (e.KeyCode == Keys.Enter) FindButton_Click(sender, EventArgs.Empty);
         }
 
+        private void ShowWidthButton_Click(object sender, EventArgs e) {
+            var s = sender as ToolStripButton;
+            var c = !s.Checked;
+            Ctl.ShowWidth = s.Checked = c;
+            Ctl.Invalidate();
+        }
     }
 }

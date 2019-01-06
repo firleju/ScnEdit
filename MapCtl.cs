@@ -49,6 +49,8 @@ namespace Trax {
         public bool ShowGrid { get; set; }
         [Category("Appearance")]
         public bool ShowDots { get; set; }
+        [Category("Appearance")]
+        public bool ShowWidth { get; set; }
 
         #endregion
 
@@ -349,7 +351,7 @@ namespace Trax {
                     using (var pen = new Pen(layer.Color)) {
                         VisibleSplines.ForEach(s => {
                             if (s.T == layer.Type) {
-                                pen.Width = T.Scale * s.W;
+                                pen.Width = this.ShowWidth ? T.Scale * s.W : System.Math.Min(T.Scale * s.W,1f);
                                 if (T.Scale < 0.01 || s.L)
                                     e.Graphics.DrawLine(pen, MapToDisplay(s.A), MapToDisplay(s.D));
                                 else {
@@ -376,7 +378,7 @@ namespace Trax {
         private void DrawSelectedSpline(PaintEventArgs e, Spline spline) {
             if (spline != null) {
                 var track = spline.Track;
-                var lineWidth = T.Scale * spline.W;
+                var lineWidth = this.ShowWidth ? T.Scale * spline.W : System.Math.Min(T.Scale * spline.W, 1f);
                 using (var pen = new Pen(SelectedTrackColor) { Width = 1f + lineWidth })
                     if (T.Scale < 0.01 || spline.L)
                         e.Graphics.DrawLine(pen, MapToDisplay(spline.A), MapToDisplay(spline.D));
@@ -400,7 +402,7 @@ namespace Trax {
         private void DrawSelectedSplineEnds(PaintEventArgs e, Spline spline) {
             if (spline != null) {
                 var track = spline.Track;
-                var lineWidth = T.Scale * spline.W;
+                var lineWidth = this.ShowWidth ? T.Scale * spline.W : System.Math.Min(T.Scale * spline.W, 1f);
                 var a = MapToDisplay(spline.A);
                 var d = MapToDisplay(spline.D);
                 var r = CharSize.Height / 2;

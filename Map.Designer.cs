@@ -1,5 +1,6 @@
 ﻿namespace Trax {
     partial class Map {
+
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -38,8 +39,9 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.ShowGridButton = new System.Windows.Forms.ToolStripButton();
             this.ShowDotsButton = new System.Windows.Forms.ToolStripButton();
-            this.FindBox = new System.Windows.Forms.ToolStripTextBox();
             this.FindButton = new System.Windows.Forms.ToolStripButton();
+            this.FindBox = new System.Windows.Forms.ToolStripTextBox();
+            this.ShowWidthButton = new System.Windows.Forms.ToolStripButton();
             this.Ctl = new Trax.MapCtl();
             this.MapToolStrip.SuspendLayout();
             this.SuspendLayout();
@@ -62,7 +64,8 @@
             this.ShowGridButton,
             this.ShowDotsButton,
             this.FindButton,
-            this.FindBox});
+            this.FindBox,
+            this.ShowWidthButton});
             resources.ApplyResources(this.MapToolStrip, "MapToolStrip");
             this.MapToolStrip.Name = "MapToolStrip";
             // 
@@ -152,13 +155,6 @@
             this.ShowDotsButton.Name = "ShowDotsButton";
             this.ShowDotsButton.Click += new System.EventHandler(this.ShowDotsButton_Click);
             // 
-            // FindBox
-            // 
-            this.FindBox.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            resources.ApplyResources(this.FindBox, "FindBox");
-            this.FindBox.Name = "FindBox";
-            this.FindBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.FindBox_KeyUp);
-            // 
             // FindButton
             // 
             this.FindButton.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
@@ -166,6 +162,20 @@
             resources.ApplyResources(this.FindButton, "FindButton");
             this.FindButton.Name = "FindButton";
             this.FindButton.Click += new System.EventHandler(this.FindButton_Click);
+            // 
+            // FindBox
+            // 
+            this.FindBox.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            resources.ApplyResources(this.FindBox, "FindBox");
+            this.FindBox.Name = "FindBox";
+            this.FindBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.FindBox_KeyUp);
+            // 
+            // ShowWidthButton
+            // 
+            this.ShowWidthButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            resources.ApplyResources(this.ShowWidthButton, "ShowWidthButton");
+            this.ShowWidthButton.Name = "ShowWidthButton";
+            this.ShowWidthButton.Click += new System.EventHandler(this.ShowWidthButton_Click);
             // 
             // Ctl
             // 
@@ -183,6 +193,7 @@
             this.Ctl.SelectedTrackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(34)))), ((int)(((byte)(0)))));
             this.Ctl.ShowDots = false;
             this.Ctl.ShowGrid = true;
+            this.Ctl.ShowWidth = false;
             this.Ctl.SwitchColor = System.Drawing.Color.Black;
             this.Ctl.TrackColor = System.Drawing.Color.Black;
             // 
@@ -219,5 +230,6 @@
         private System.Windows.Forms.ToolStripLabel ScaleLabelTitle;
         private System.Windows.Forms.ToolStripTextBox FindBox;
         private System.Windows.Forms.ToolStripButton FindButton;
+        private System.Windows.Forms.ToolStripButton ShowWidthButton;
     }
 }

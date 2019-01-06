@@ -49,7 +49,7 @@ namespace Trax {
         public Main(string[] args) {
             InitializeComponent();
             SuspendLayout();
-            (new VS2012ToolStripExtender { VS2012Renderer = new VS2012ToolStripRenderer() }).SetEnableVS2012Style(MainMenu, true);
+            //(new VS2012ToolStripExtender { VS2012Renderer = new VS2012ToolStripRenderer() }).SetEnableVS2012Style(MainMenu, true);
             Status.Main = this;
             EditorFile.Main = this;
             ProjectPanel.Main = this;
