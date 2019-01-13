@@ -1,4 +1,4 @@
-﻿using FastColoredTextBoxNS;
+using FastColoredTextBoxNS;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -137,7 +137,7 @@ namespace Trax {
         protected override void OnCellDoubleClick(DataGridViewCellEventArgs e) {
             if (e.RowIndex >= 0) {
                 var item = DataSource.Items[e.RowIndex];
-                var file = ProjectFile.All.FirstOrDefault(i => i.Path == item.Path);
+                var file = ProjectFile.MainFiles.FirstOrDefault(i => i.Path == item.Path);
                 if (file != null) {
                     var editor = file.Editor;
                     var place =

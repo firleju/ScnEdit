@@ -15,7 +15,7 @@ namespace Trax {
         #region Fields
 
         internal static Main Main;
-        internal static new List<EditorFile> All = new List<EditorFile>();
+        internal static new List<EditorFile> MainFiles = new List<EditorFile>();
 
         #endregion
 
@@ -35,13 +35,13 @@ namespace Trax {
         #region Methods
 
         public static void Reset() {
-            All.ForEach(i => {
+            MainFiles.ForEach(i => {
                 i.Editor.Dispose();
                 i.Container.DocumentMap.Dispose();
                 i.Container.Splitter.Dispose();
                 i.Container.Dispose();
             });
-            All.Clear();
+            MainFiles.Clear();
             var s = Properties.Settings.Default;
             s.LastOpenFile = null;
             s.Save();
@@ -73,20 +73,20 @@ namespace Trax {
         }
 
         public static void SaveAll() {
-            if (BatchStart != null) BatchStart.Invoke(All, EventArgs.Empty);
-            All.ForEach(m => m.Save());
-            if (BatchEnd != null) BatchEnd.Invoke(All, EventArgs.Empty);
+            if (BatchStart != null) BatchStart.Invoke(MainFiles, EventArgs.Empty);
+            MainFiles.ForEach(m => m.Save());
+            if (BatchEnd != null) BatchEnd.Invoke(MainFiles, EventArgs.Empty);
         }
 
         public static bool ProceedWithUnsavedChanges() {
-            if (All.Count < 1) return true;
-            foreach (EditorFile i in All) if (!i.Container.ProceedWithUnsavedChanges()) return false;
+            if (MainFiles.Count < 1) return true;
+            foreach (EditorFile i in MainFiles) if (!i.Container.ProceedWithUnsavedChanges()) return false;
             return true;
         }
 
         public static void Run(bool debug = true, bool andExit = false) {
-            if (All.Count < 1) return;
-            var main = All.First(i => i.Type == Types.SceneryMain);
+            if (MainFiles.Count < 1) return;
+            var main = MainFiles.First(i => i.Type == Types.SceneryMain);
             if (main != null && !String.IsNullOrWhiteSpace(main.BaseDirectory) && ProceedWithUnsavedChanges()) {
                 var simExe = String.Format("{0}\\{1}", main.BaseDirectory, System.IO.Path.GetFileName(Properties.Settings.Default.SimExe));
                 if (System.IO.File.Exists(simExe)) {
@@ -139,8 +139,8 @@ namespace Trax {
             if (file.TextCache != null) TextCache = file.TextCache;
             IsChanged = file.IsChanged;
             Open(DockState.Document);
-            var projectIndex = ProjectFile.All.FindIndex(i => i.Path == Path);
-            if (projectIndex >= 0) ProjectFile.All[projectIndex] = this;
+            var projectIndex = ProjectFile.MainFiles.FindIndex(i => i.Path == Path);
+            if (projectIndex >= 0) ProjectFile.MainFiles[projectIndex] = this;
 
         }
 
@@ -175,7 +175,7 @@ namespace Trax {
         #region Private methods
 
         private void Open(DockState dockState = DockState.Document) {
-            var existing = All.FirstOrDefault(i => i.Path == this.Path);
+            var existing = MainFiles.FirstOrDefault(i => i.Path == this.Path);
             if (existing != null) {
                 existing.Container.Activate();
                 return;
@@ -194,12 +194,12 @@ namespace Trax {
             Container.UpdateText();
             if (ReadingFileDone != null) ReadingFileDone.Invoke(this, EventArgs.Empty);
             Application.DoEvents();
-            if (All.Count < 1) {
+            if (MainFiles.Count < 1) {
                 var s = Properties.Settings.Default;
                 s.LastOpenFile = Path;
                 s.Save();
             }
-            All.Add(this);
+            MainFiles.Add(this);
             Status.FileName = FileName;
         }
 

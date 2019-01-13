@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -447,12 +447,12 @@ namespace Trax {
                 var infoHeaderPosition = new PointF(Width - CharSize.Width * 60, Height - CharSize.Height * 8);
                 var infoPosition = new PointF(Width - CharSize.Width * 60, Height - CharSize.Height * 7);
                 var events = new StringBuilder();
-                if (track.Event0 != null) { events.Append("Event0 = "); events.AppendLine(track.Event0); }
-                if (track.Event1 != null) { events.Append("Event1 = "); events.AppendLine(track.Event1); }
-                if (track.Event2 != null) { events.Append("Event2 = "); events.AppendLine(track.Event2); }
-                if (track.Eventall0 != null) { events.Append("Eventall0 = "); events.AppendLine(track.Eventall0); }
-                if (track.Eventall1 != null) { events.Append("Eventall1 = "); events.AppendLine(track.Eventall1); }
-                if (track.Eventall2 != null) { events.Append("Eventall2 = "); events.AppendLine(track.Eventall2); }
+                if (track.Event0 != null) { events.Append("Event0 = "); foreach(var ev in track.Event0) events.Append(ev); events.AppendLine(); }
+                if (track.Event1 != null) { events.Append("Event1 = "); foreach (var ev in track.Event1) events.Append(ev); events.AppendLine(); }
+                if (track.Event2 != null) { events.Append("Event2 = "); foreach (var ev in track.Event2) events.Append(ev); events.AppendLine(); }
+                if (track.Eventall0 != null) { events.Append("Eventall0 = "); foreach (var ev in track.Eventall0) events.Append(ev); events.AppendLine(); }
+                if (track.Eventall1 != null) { events.Append("Eventall1 = "); foreach (var ev in track.Eventall1) events.Append(ev); events.AppendLine(); }
+                if (track.Eventall2 != null) { events.Append("Eventall2 = "); foreach (var ev in track.Eventall2) events.Append(ev); events.AppendLine(); }
                 if (track.Velocity != null) { events.Append("Velocity = "); events.AppendLine(track.Velocity.ToString()); }
                 var bold = new Font(Font, FontStyle.Bold);
                 var header = Messages.TrackSelected;
@@ -730,8 +730,8 @@ namespace Trax {
         internal void FindName(string name) {
             foreach (var spline in Splines) {
                 var track = spline.Track;
-                if (track.Name == name || track.Event0 == name || track.Event1 == name || track.Event2 == name ||
-                    track.Eventall0 == name || track.Eventall1 == name || track.Eventall2 == name) {
+                if (track.Name == name || track.Event0.Contains(name) || track.Event1.Contains(name) || track.Event2.Contains(name) ||
+                    track.Eventall0.Contains(name) || track.Eventall1.Contains(name) || track.Eventall2.Contains(name)) {
                     Position = -V3D.Interpolate(track.Point1, track.Point2, 0.5d);
                     if (Scale < 1f) Scale = 1f;
                     Selection.Current = spline;

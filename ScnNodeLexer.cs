@@ -51,7 +51,7 @@ namespace Trax {
                 isCommentStart = c == '/';
                 isComment = isCommentStart && lastCommentStart; // true on second '/' in a row
                 lastCommentStart = isCommentStart;
-                isEnd = isWhiteSpace || isComment || i == sourceLastIndex; // identifier is considered ended after whitespace character, comment start or end of data
+                isEnd = (isWhiteSpace && fragment != "") || isComment || i == sourceLastIndex; // identifier is considered ended after whitespace character, comment start or end of data
                 switch (state) {
                     case States.Scan:
                         if (isWhiteSpace) {

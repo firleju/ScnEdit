@@ -88,7 +88,7 @@ namespace Trax {
         }
 
         void EditorContainer_FormClosed(object sender, System.Windows.Forms.FormClosedEventArgs e) {
-            EditorFile.All.Remove(Editor.File);
+            EditorFile.MainFiles.Remove(Editor.File);
             Editor.Dispose();
         }
 

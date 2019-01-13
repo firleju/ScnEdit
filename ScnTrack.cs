@@ -53,27 +53,30 @@ namespace Trax {
         // optional
         public double? TrackLength2;
         public double? Velocity;
-        public string Event0;
-        public string Event1;
-        public string Event2;
-        public string Eventall0;
-        public string Eventall1;
-        public string Eventall2;
-        public string Isolated;
+        public List<string> Event0 = new List<string>();
+        public List<string> Event1 = new List<string>();
+        public List<string> Event2 = new List<string>();
+        public List<string> Eventall0 = new List<string>();
+        public List<string> Eventall1 = new List<string>();
+        public List<string> Eventall2 = new List<string>();
+        public List<string> Isolated = new List<string>();
         public string Extras;
         // editor specific
         public string IncludesBefore;
         public string IncludesAfter;
-
+        // connected tracks
+        private ScnTrack[] Connected = new ScnTrack[3] { null, null, null };
         #endregion
 
         #region Properties
 
         public bool IsSwitch { get { return Point3 != null; } }
+        public bool IsDerail { get { return Point3 != null && Connected[2] == null; } }
+        public bool IsTrackEnd { get { return Connected[0] == null ^ Connected[1] == null; } }
         public int SwitchState { get; set; }
         public V3D P1 { get { return SwitchState == 0 ? Point1 : Point3; } }
         public V3D P2 { get { return SwitchState == 0 ? Point2 : Point4; } }
-
+        public ScnTrack[] Neighbors { get { return Connected; } }
         #endregion
 
         /// <summary>
@@ -171,13 +174,13 @@ namespace Trax {
                         else {
                             switch (xname) {
                                 case "velocity": Velocity = (double)value; break;
-                                case "event0": Event0 = (string)value; break;
-                                case "event1": Event1 = (string)value; break;
-                                case "event2": Event2 = (string)value; break;
-                                case "eventall0": Eventall0 = (string)value; break;
-                                case "eventall1": Eventall1 = (string)value; break;
-                                case "eventall2": Eventall2 = (string)value; break;
-                                case "isolated": Isolated = (string)value; break;
+                                case "event0": Event0.Add((string)value); break;
+                                case "event1": Event1.Add((string)value); break;
+                                case "event2": Event2.Add((string)value); break;
+                                case "eventall0": Eventall0.Add((string)value); break;
+                                case "eventall1": Eventall1.Add((string)value); break;
+                                case "eventall2": Eventall2.Add((string)value); break;
+                                case "isolated": Isolated.Add((string)value); break;
                                 default: extras.Add(xname); extras.Add(GetString(value)); break;
                             }
                         }
@@ -219,6 +222,26 @@ namespace Trax {
         }
 
         /// <summary>
+        /// Returns number of point where given track is connected to. 0 if there is no connection.
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        private int IsLinked(ScnTrack t) {
+            if (IsLinked(Point1, t.Point1) || IsLinked(Point1, t.Point2) || IsLinked(Point1, t.Point4)) {
+                return 1;
+            }
+            else if (IsLinked(Point2, t.Point1) || IsLinked(Point2, t.Point2) || IsLinked(Point2, t.Point4)) {
+                return 2;
+            }
+            else if (IsLinked(Point4, t.Point1) || IsLinked(Point4, t.Point2) || IsLinked(Point4, t.Point4)) {
+                return 3;
+            }
+            else {
+                return 0;
+            }
+        }
+
+        /// <summary>
         /// Returns true if this track's start is linked to given track end
         /// </summary>
         /// <param name="track"></param>
@@ -251,6 +274,34 @@ namespace Trax {
         /// <returns></returns>
         public bool IsLinkedTo(ScnTrack track, out bool switchEnd) {
             return IsStartLinkedTo(track, out switchEnd) || IsEndLinkedTo(track, out switchEnd);
+        }
+
+        /// <summary>
+        /// Returns track that is on opposite site of given track
+        /// </summary>
+        /// <param name="track"></param>
+        /// <returns></returns>
+        public ScnTrack Next(ScnTrack prev) {
+            var n = IsLinked(prev);
+            if (n == 1) return SwitchState == 0 ? Connected[1] : Connected[2]; //Point2 i Point4
+            else if (n == 2 && n == 3) return Connected[0]; //Point1 || Point3
+            else return null;
+        }
+
+        /// <summary>
+        /// Set track to list of neighbours in given connected point of parent
+        /// </summary>
+        public void SetNeighbourTrack(ScnTrack neighbour, int connection_no) {
+            Connected[connection_no] = neighbour;
+        }
+
+        /// <summary>
+        /// Set track to list of neighbours with check on wich point it is connected
+        /// </summary>
+        public void SetNeighbourTrack(ScnTrack neighbour) {
+            var n = IsLinked(neighbour);
+            if (n > 0)
+                Connected[n - 1] = neighbour;
         }
 
         /// <summary>
@@ -344,12 +395,13 @@ namespace Trax {
             if (switchPart != null) text += "\r\n" + switchPart;
             if (TrackLength2 != null) text += String.Format("\r\ntracklength {0}", ScnNumbers.ToString(TrackLength2));
             if (Velocity != null) text += String.Format("\r\nvelocity {0}", ScnNumbers.ToString(Velocity));
-            if (Event0 != null) text += String.Format("\r\nevent0 {0}", Event0);
-            if (Event1 != null) text += String.Format("\r\nevent1 {0}", Event1);
-            if (Event2 != null) text += String.Format("\r\nevent2 {0}", Event2);
-            if (Eventall0 != null) text += String.Format("\r\neventall0 {0}", Eventall0);
-            if (Eventall1 != null) text += String.Format("\r\neventall0 {0}", Eventall1);
-            if (Eventall2 != null) text += String.Format("\r\neventall0 {0}", Eventall2);
+            foreach (var e in Event0) text += String.Format("\r\nevent0 {0}", e);
+            foreach (var e in Event1) text += String.Format("\r\nevent1 {0}", e);
+            foreach (var e in Event2) text += String.Format("\r\nevent2 {0}", e);
+            foreach (var e in Eventall0) text += String.Format("\r\neventall0 {0}", e);
+            foreach (var e in Eventall1) text += String.Format("\r\neventall1 {0}", e);
+            foreach (var e in Eventall2) text += String.Format("\r\neventall2 {0}", e);
+            foreach (var e in Isolated) text += String.Format("\r\nisolated {0}", e);
             if (Extras != null) text += "\r\n" + Extras;
             text += "\r\nendtrack";
             if (IncludesAfter != null) text += "\r\n" + IncludesAfter;
@@ -428,7 +480,7 @@ namespace Trax {
 
         public static ScnTrackCollection Load() {
             var tracks = new ScnTrackCollection();
-            ProjectFile.All.ForEach(f => {
+            ProjectFile.MainFiles.ForEach(f => {
                 if (f.Type == ProjectFile.Types.SceneryPart || f.Type == ProjectFile.Types.SceneryMain) {
                     var set = ScnTrackCollection.Parse(f.Text, f.Path, ScnTrackIncludes.Ignore);
                     if (set.Count > 0) tracks.AddRange(set);
@@ -511,6 +563,17 @@ namespace Trax {
             }
             Clear();
             AddRange(l);
+        }
+
+        /// <summary>
+        /// Add neighbour tracks to each others
+        /// </summary>
+        public void FindAndSetNeighbours() {
+            foreach (var p in this) {
+                foreach (var n in this) {
+                    if (n != p) p.SetNeighbourTrack(n); // check and connect neighbours for t track
+                }
+            }
         }
 
         /// <summary>

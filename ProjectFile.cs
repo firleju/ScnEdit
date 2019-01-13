@@ -1,4 +1,4 @@
-﻿using FastColoredTextBoxNS;
+using FastColoredTextBoxNS;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -25,9 +25,7 @@ namespace Trax {
 
         #region Properties
 
-        internal static List<ProjectFile> All { get; set; }
-        
-        internal List<ProjectFile> References { get; set; }
+        internal List<ProjectFile> References { get { return _references; } set { _references = value; } }
 
         #endregion
 
@@ -41,24 +39,30 @@ namespace Trax {
         internal string Directory;
         internal string FileName;
         internal string RelativeDirectory;
+        internal List<string> FileParams;
         internal bool IsConverted;
         internal bool IsNormalized;
         internal bool IsChanged;
 
         public string TextCache;
-
+        internal static Dictionary<string, string> TextCacheDictionary = new Dictionary<string, string>();
+        internal static List<ProjectFile> AllFiles = new List<ProjectFile>();
+        internal static List<ProjectFile> MainFiles = new List<ProjectFile>();
+        private List<ProjectFile> _references;
+        internal static Dictionary<string, ScnEvent> EventCollection = new Dictionary<string, ScnEvent>();
+        internal static Dictionary<string, ScnMemCell> MemCellCollection = new Dictionary<string, ScnMemCell>();
         #endregion
 
         #region Properties
 
         internal static ProjectFile Project {
             get {
-                return ProjectFile.All.Find(i => i.Role == Roles.Main);
+                return ProjectFile.MainFiles.Find(i => i.Role == Roles.Main);
             }
         }
 
         internal static List<ProjectFile> ProjectFiles {
-            get { return ProjectFile.All; }
+            get { return ProjectFile.AllFiles; }
         }
 
         internal bool IsOpen { get { return this is EditorFile; } }
@@ -85,24 +89,32 @@ namespace Trax {
 
         internal virtual string Text {
             get {
-                using (var stream = File.Open(Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
-                    var buffer = new byte[stream.Length];
-                    stream.Read(buffer, 0, (int)stream.Length);
-                    stream.Close();
-                    return TextCache = PreNormalize(
-                        (AutoDecoding && !HasHtmlEncoding)
-                            ? AutoDecode(EncodingDefault, buffer, out IsConverted)
-                            : EncodingDefault.GetString(buffer)
-                    );
+                if (TextCache == null) {
+                    if (TextCacheDictionary.ContainsKey(Path)) {
+                        return TextCache = TextCacheDictionary[Path];
+                    }
+                    else {
+                        using (var stream = File.Open(Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
+                            var buffer = new byte[stream.Length];
+                            stream.Read(buffer, 0, (int)stream.Length);
+                            stream.Close();
+                            return TextCache = TextCacheDictionary[Path] = PreNormalize(
+                                (AutoDecoding && !HasHtmlEncoding)
+                                    ? AutoDecode(EncodingDefault, buffer, out IsConverted)
+                                    : EncodingDefault.GetString(buffer)
+                            );
+                        }
+                    }
                 }
+                else return TextCache;
             }
         }
 
         internal Editor Editor {
             get {
-                var editorFile = EditorFile.All.FirstOrDefault(i => i.Path == this.Path);
+                var editorFile = EditorFile.MainFiles.FirstOrDefault(i => i.Path == this.Path);
                 if (editorFile == null) Open();
-                editorFile = EditorFile.All.First(i => i.Path == this.Path);
+                editorFile = EditorFile.MainFiles.First(i => i.Path == this.Path);
                 if (editorFile == null) return null;
                 return editorFile.Editor;
             }
@@ -123,11 +135,12 @@ namespace Trax {
         /// </summary>
         /// <param name="path">File system path</param>
         /// <param name="role">Project role</param>
-        internal ProjectFile(string path, Roles role = Roles.Any) {
+        internal ProjectFile(string path, Roles role = Roles.Any, string par = "") {
             Role = role;
             Path = path.Replace('/', '\\');
             Type = GetFileType(Path);
-            if (Role == Roles.Timetable) Type = Types.Timetable;
+            char[] delim = { ' ', '\t', ';', '\r', '\n' };
+            FileParams = par.Split(delim).ToList(); if (Role == Roles.Timetable) Type = Types.Timetable;
             if (Type == Types.SceneryMain) Role = Roles.Main;
             var sceneryIndex = path.IndexOf(Properties.Settings.Default.SceneryDirectory, StringComparison.InvariantCultureIgnoreCase);
             var sceneryLength = _SceneryDirectoryName.Length;
@@ -138,11 +151,11 @@ namespace Trax {
                 SceneryDirectory = BaseDirectory + "\\" + Path.Substring(sceneryIndex, sceneryLength);
                 RelativeDirectory = Directory.Replace(SceneryDirectory, "");
             }
-            if (All != null && All.Exists(i => i.Path == Path)) return;
+            if (MainFiles != null && MainFiles.Exists(i => i.Path == Path)) return;
             if (Type == Types.SceneryMain && Role == Roles.Main) GetScenery(this);
             else {
-                if (All == null) All = new List<ProjectFile>();
-                All.Add(this);
+                if (MainFiles == null) MainFiles = new List<ProjectFile>();
+                MainFiles.Add(this);
             }
         }
 
@@ -319,9 +332,9 @@ namespace Trax {
             References = new List<ProjectFile>();
             var w = new BackgroundWorker();
             w.DoWork += new DoWorkEventHandler((s, e) => {
-                GetReferences(Roles.Include, new ScnSyntax.IncludeSimple());
-                GetReferences(Roles.Timetable, new ScnSyntax.Timetable(), new[] { "none", "rozklad" }, null, ".txt");
-                GetReferences(Roles.Description, new ScnSyntax.CommandInclude(), null, new[] { ".txt", ".html" });
+                GetReferences(Roles.Include, new ScnSyntax.IncludeSimple(), ref _references);
+                GetReferences(Roles.Timetable, new ScnSyntax.Timetable(), ref _references, false, new[] { "none", "rozklad" }, null, ".txt");
+                GetReferences(Roles.Description, new ScnSyntax.CommandInclude(), ref _references, false, null, new[] { ".txt", ".html" });
             });
             if (Role == Roles.Main)
                 w.RunWorkerCompleted += new RunWorkerCompletedEventHandler((s, e) => {
@@ -332,9 +345,42 @@ namespace Trax {
         }
 
         /// <summary>
+        /// Gets all file references associated with main project file
+        /// </summary>
+        internal void GetReferencesMain() {
+            GetReferences(Roles.Main, new ScnSyntax.IncludeSimple(), ref MainFiles);
+        }
+
+        /// <summary>
+        /// Gets all events with their params in all included files (such as semaphor inc)
+        /// </summary>
+        internal void GetReferencesAll() {
+            GetReferences(Roles.Include, new ScnSyntax.IncludeWithParams(), ref AllFiles, true);
+        }
+
+        internal void GetMemCells() {
+            var input = !Role.HasFlag(Roles.Description) ? new ScnSyntax.Comment().Replace(Text, "") : Text;
+
+            var t = ScnMemCellCollection.Parse(ref input, FileParams);
+            t.ToList().ForEach(x => MemCellCollection[x.Key] = x.Value);
+        }
+
+        internal void GetEvents() {
+            var input = !Role.HasFlag(Roles.Description) ? new ScnSyntax.Comment().Replace(Text, "") : Text;
+
+            foreach (Match m in new ScnSyntax.EventParams().Matches(input)) {
+                var e = new ScnEvent(m.Value, FileParams);
+                EventCollection.Add(e.Name, e);
+                //log.Trace("Type: {0}, Name: {1}", e.Type, e.Name);
+            }
+
+        }
+
+
+        /// <summary>
         /// Opens all project's references
         /// </summary>
-        internal void OpenReferences() { All.ForEach(i => i.Open()); }
+        internal void OpenReferences() { MainFiles.ForEach(i => i.Open()); }
 
         #endregion
 
@@ -373,8 +419,8 @@ namespace Trax {
                 Main.Instance.TrackMap.Dispose();
                 Main.Instance.TrackMap = null;
             }
-            All = new List<ProjectFile>();
-            All.Add(f);
+            MainFiles = new List<ProjectFile>();
+            MainFiles.Add(f);
         }
 
         private Types GetFileType(string file) {
@@ -390,20 +436,25 @@ namespace Trax {
             return Types.Text;
         }
 
-        private void GetReferences(Roles role, Regex r, string[] ignore = null, string[] allow = null, string defaultExt = null) {
+        private void GetReferences(Roles role, Regex r, ref List<ProjectFile> ref_list, bool allow_duplicates = false,
+            string[] ignore = null, string[] allow = null, string defaultExt = null) { 
             var input = !Role.HasFlag(Roles.Description) ? new ScnSyntax.Comment().Replace(Text, "") : Text;
             foreach (Match m in r.Matches(input)) {
                 if (ignore != null && ignore.Contains(m.Value)) continue;
+                char[] delim = { ' ', '\t', ';', '\r', '\n' };
+                var list = m.Value.Split(delim, 2);
+                string file = list[0];
+
                 var path = ((role == Roles.Description ? BaseDirectory : SceneryDirectory) + "\\" + m.Value).Replace('/', '\\');
                 var ext = System.IO.Path.GetExtension(m.Value);
                 if (defaultExt != null && ext == "") { ext = defaultExt; path += ext; }
                 if (System.IO.File.Exists(path)) {
                     if (allow != null && !allow.Contains(ext)) continue;
-                    if (!References.Any(p => p.Path == path)) {
-                        var reference = new ProjectFile(path, role);
-                        References.Add(reference);
-                        reference.GetReferences();
-                    }
+                    if (!ref_list.Any(p => p.Path == path) || allow_duplicates) {
+                        var reference = new ProjectFile(path, role, list.Length == 2 ? list[1] : "");
+                        ref_list.Add(reference);
+                        reference.GetReferences(role,r,ref ref_list,allow_duplicates,ignore,allow,defaultExt);
+                   }
                 }
             }
         }

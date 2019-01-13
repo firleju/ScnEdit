@@ -71,6 +71,7 @@
     </Compile>
     <Compile Include="ColorSchemes\Colors_Dark_Original.cs" />
     <Compile Include="ColorSchemes\Colors_Gray_Zenburn.cs" />
+    <Compile Include="Common.cs" />
     <Compile Include="Credits.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -97,6 +98,8 @@
       <DependentUpon>MapCtl.cs</DependentUpon>
     </Compile>
     <Compile Include="ScnBezier.cs" />
+    <Compile Include="ScnEvent.cs" />
+    <Compile Include="ScnMemCell.cs" />
     <Compile Include="ScnNodeLexer.cs" />
     <Compile Include="ScnNumbers.cs" />
     <Compile Include="IColorScheme.cs" />

@@ -65,7 +65,7 @@ namespace Trax {
             if (String.IsNullOrWhiteSpace(FileToOpen) && !String.IsNullOrWhiteSpace(Settings.LastOpenFile)) FileToOpen = Settings.LastOpenFile;
             if (FileToOpen != null && System.IO.File.Exists(FileToOpen)) {
                 new EditorFile(FileToOpen);
-                if (EditorFile.All.Count > 0) EnableEdit();
+                if (EditorFile.MainFiles.Count > 0) EnableEdit();
                 Status.Visible = true;
             } else Credits.Show();
             foreach (TypeInfo t in EditorSyntax.Styles.ConfiguredColorSchemes) {
@@ -81,7 +81,7 @@ namespace Trax {
             EditorSyntax.Styles.SetColorScheme(schemeName = item.Text.Replace(" ", "_"));
             foreach (ToolStripMenuItem i in ColorSchemeMenu.DropDownItems) i.Checked = false;
             DockPanel.BackColor = DockPanel.DockBackColor = EditorSyntax.Styles.ColorScheme.Background;
-            EditorFile.All.ForEach(i => { i.Editor.ReloadScheme(); });
+            EditorFile.MainFiles.ForEach(i => { i.Editor.ReloadScheme(); });
             if (SceneryPanel != null) SceneryPanel.ReloadScheme();
             if (SearchResultsPanel != null) SearchResultsPanel.ReloadScheme();
             item.Checked = true;
@@ -109,7 +109,7 @@ namespace Trax {
 
         private void OpenFile_FileOk(object sender, CancelEventArgs e) {
             new EditorFile(OpenFileDialog.FileName);
-            if (EditorFile.All.Count > 0) { EnableEdit(); Status.Visible = true; }
+            if (EditorFile.MainFiles.Count > 0) { EnableEdit(); Status.Visible = true; }
         }
 
         public void DisableEdit(bool useWaitCursor = false) {
@@ -141,7 +141,7 @@ namespace Trax {
         }
 
         private void SaveAllMenuItem_Click(object sender, EventArgs e) {
-            EditorFile.All.ForEach(i => i.Save());
+            EditorFile.MainFiles.ForEach(i => i.Save());
         }
 
         private void CloseMenuItem_Click(object sender, EventArgs e) {
@@ -201,19 +201,19 @@ namespace Trax {
         }
 
         private void SceneryUndoMenuItem_Click(object sender, EventArgs e) {
-            EditorFile.All.ForEach(i => { while (i.Editor.UndoEnabled) i.Editor.Undo(); });
+            EditorFile.MainFiles.ForEach(i => { while (i.Editor.UndoEnabled) i.Editor.Undo(); });
         }
 
         private void SceneryRedoMenuItem_Click(object sender, EventArgs e) {
-            EditorFile.All.ForEach(i => { while (i.Editor.RedoEnabled) i.Editor.Redo(); });
+            EditorFile.MainFiles.ForEach(i => { while (i.Editor.RedoEnabled) i.Editor.Redo(); });
         }
 
         private void SceneryNormalizeMenuItem_Click(object sender, EventArgs e) {
             DisableEdit(true);
             Status.Text = Messages.NormalizeInProgress;
             Application.DoEvents();
-            for (int i = 0, n = ProjectFile.All.Count; i < n; i++) {
-                var f = ProjectFile.All[i];
+            for (int i = 0, n = ProjectFile.MainFiles.Count; i < n; i++) {
+                var f = ProjectFile.MainFiles[i];
                 var t = f.Normalize();
                 if (f.IsNormalized || t.Length != f.TextCache.Length) {
                     f.TextCache = t;
@@ -242,7 +242,7 @@ namespace Trax {
         }
 
         private void SceneryReloadMenuItem_Click(object sender, EventArgs e) {
-            var mainFile = EditorFile.All.First(i => i.Role == EditorFile.Roles.Main);
+            var mainFile = EditorFile.MainFiles.First(i => i.Role == EditorFile.Roles.Main);
             if (mainFile != null) {
                 var mainFilePath = mainFile.Path;
                 EditorFile.Reset();
