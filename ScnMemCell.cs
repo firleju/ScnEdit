@@ -13,7 +13,9 @@ namespace Trax {
         internal enum States { Scan, Parameter };
         private static IFormatProvider FP = System.Globalization.CultureInfo.InvariantCulture; // needed to have C default decimal separator
 
-
+        #region Fields
+        private static NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
+        #endregion
 
         #region Properties
         public EventTypes Type { get; internal set; }
@@ -33,12 +35,17 @@ namespace Trax {
             SpeedListShunt = new Dictionary<double, string>();
             int block = 0;
             Name = Tools.ChangeParamsToText(node.Name, param_list);
-            foreach (var value in node.Values) {
-                switch (block++) {
-                    case 0: Point.X = double.Parse(Tools.ChangeParamsToText((string)value, param_list), FP); break;
-                    case 1: Point.Y = double.Parse(Tools.ChangeParamsToText((string)value, param_list), FP); break;
-                    case 2: Point.Z = double.Parse(Tools.ChangeParamsToText((string)value, param_list), FP); break;
-                    case 3: Type = Tools.GetEventTypeFromString((string)value); break;
+                foreach (var value in node.Values) {
+                try {
+                    switch (block++) {
+                        case 0: Point.X = value.GetType() != typeof(double) ? double.Parse(Tools.ChangeParamsToText((string)value, param_list), FP) : (double)value; break;
+                        case 1: Point.Y = value.GetType() != typeof(double) ? double.Parse(Tools.ChangeParamsToText((string)value, param_list), FP) : (double)value; break;
+                        case 2: Point.Z = value.GetType() != typeof(double) ? double.Parse(Tools.ChangeParamsToText((string)value, param_list), FP) : (double)value; break;
+                        case 3: Type = value != null? Tools.GetEventTypeFromString((string)value): EventTypes.Unknown; break;
+                    }
+                }
+                catch (Exception x) {
+                    log.Error(x.Message + "\r\n" + x.StackTrace + "\r\n");
                 }
             }
         }
@@ -94,7 +101,7 @@ namespace Trax {
     }
 
     public class ScnMemCellCollection : Dictionary<string, ScnMemCell> {
-        //private static NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
+        private static NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
 
 
         public static ScnMemCellCollection Parse(ref string text, List<string> param_list) {
@@ -105,12 +112,12 @@ namespace Trax {
                     foreach (var node in lexer.Nodes) {
                         var m = new ScnMemCell(node, param_list);
                         cells.Add(m.Name, m);
-                        //log.Trace("memcell, type {0}, name {1}", m.Type, m.Name);
+                        log.Trace("memcell, type {0}, name {1} params {2}", m.Type, m.Name, param_list);
                     }
             }
             catch (Exception x) {
-                //log.Error(x.Message + "\r\n\r\n" + x.StackTrace);
-                System.Windows.Forms.MessageBox.Show(x.Message + "\r\n\r\n" + x.StackTrace);
+                log.Error(x.Message + "\r\n" + x.StackTrace + "\r\n");
+                //System.Windows.Forms.MessageBox.Show(x.Message + "\r\n\r\n" + x.StackTrace);
             }
             return cells;
         }

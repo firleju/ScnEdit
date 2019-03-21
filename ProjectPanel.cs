@@ -26,8 +26,21 @@ namespace Trax {
             Tree = new ProjectTree() { Name = Text, Dock = DockStyle.Fill, LabelEdit = true };
             Root = Tree.Nodes.Add(Project.FileName, Project.FileName, 0);
             Root.Tag = Project;
-            Project.GetReferences();
             Project.ReferencesResolved += file_ReferencesResolved;
+
+            var w = new BackgroundWorker();
+            w.DoWork += new DoWorkEventHandler((s, e) => {
+                for (int i = 0; i < ProjectFile.MainFiles.Count; i++) {
+                    ProjectFile.MainFiles[i].GetReferences();
+                }
+            });
+            w.RunWorkerCompleted += new RunWorkerCompletedEventHandler((s, e) => {
+                Project.Invoke();
+            });
+            w.RunWorkerAsync();
+            w.Dispose();
+
+            //Project.GetReferences();
             ReloadScheme();
             Controls.Add(Tree);
             DockPanel = Main.DockPanel;

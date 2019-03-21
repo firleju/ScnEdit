@@ -151,12 +151,12 @@ namespace Trax {
                 SceneryDirectory = BaseDirectory + "\\" + Path.Substring(sceneryIndex, sceneryLength);
                 RelativeDirectory = Directory.Replace(SceneryDirectory, "");
             }
-            if (MainFiles != null && MainFiles.Exists(i => i.Path == Path)) return;
+            //if (MainFiles != null && MainFiles.Exists(i => i.Path == Path)) return;
             if (Type == Types.SceneryMain && Role == Roles.Main) GetScenery(this);
-            else {
-                if (MainFiles == null) MainFiles = new List<ProjectFile>();
-                MainFiles.Add(this);
-            }
+            //else {
+            //    if (MainFiles == null) MainFiles = new List<ProjectFile>();
+            //    MainFiles.Add(this);
+            //}
         }
 
         /// <summary>
@@ -330,18 +330,23 @@ namespace Trax {
         /// </summary>
         internal void GetReferences() {
             References = new List<ProjectFile>();
-            var w = new BackgroundWorker();
-            w.DoWork += new DoWorkEventHandler((s, e) => {
+            //var w = new BackgroundWorker();
+            //w.DoWork += new DoWorkEventHandler((s, e) => {
                 GetReferences(Roles.Include, new ScnSyntax.IncludeSimple(), ref _references);
                 GetReferences(Roles.Timetable, new ScnSyntax.Timetable(), ref _references, false, new[] { "none", "rozklad" }, null, ".txt");
                 GetReferences(Roles.Description, new ScnSyntax.CommandInclude(), ref _references, false, null, new[] { ".txt", ".html" });
-            });
-            if (Role == Roles.Main)
-                w.RunWorkerCompleted += new RunWorkerCompletedEventHandler((s, e) => {
-                    if (ReferencesResolved != null) ReferencesResolved.Invoke(this, EventArgs.Empty);
-                });
-            w.RunWorkerAsync();
-            w.Dispose();
+            MainFiles.AddRange(References);
+            //});
+            //if (Role == Roles.Main)
+            //    w.RunWorkerCompleted += new RunWorkerCompletedEventHandler((s, e) => {
+            //        if (ReferencesResolved != null) ReferencesResolved.Invoke(this, EventArgs.Empty);
+            //    });
+            //w.RunWorkerAsync();
+            //w.Dispose();
+        }
+
+        internal void Invoke() {
+            ReferencesResolved.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -453,7 +458,9 @@ namespace Trax {
                     if (!ref_list.Any(p => p.Path == path) || allow_duplicates) {
                         var reference = new ProjectFile(path, role, list.Length == 2 ? list[1] : "");
                         ref_list.Add(reference);
-                        reference.GetReferences(role,r,ref ref_list,allow_duplicates,ignore,allow,defaultExt);
+                        reference.GetMemCells();
+                        reference.GetEvents();
+                        //reference.GetReferences(role,r,ref ref_list,allow_duplicates,ignore,allow,defaultExt);
                    }
                 }
             }

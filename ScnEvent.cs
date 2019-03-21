@@ -41,7 +41,7 @@ namespace Trax
             string fragment = "";
             char c;
             bool isEndLine = false;
-            bool isWhiteSpace;
+            bool isWhiteSpace = false;
             bool isCommentStart, lastCommentStart = false, isComment = false;
             bool isParamStart = false, isParamEnd = false;
             bool isEnd = false;
@@ -55,7 +55,7 @@ namespace Trax
                 isParamEnd = c == ')';
                 isComment = isCommentStart && lastCommentStart; // true on second '/' in a row
                 lastCommentStart = isCommentStart;
-                isEnd = isWhiteSpace || isComment || i == sourceLastIndex; // identifier is considered ended after whitespace character, comment start or end of data
+                isEnd = (isWhiteSpace && fragment != "") || isComment || i == sourceLastIndex; // identifier is considered ended after whitespace character, comment start or end of data
                 switch (state) {
                     case EventStates.Name:
                         if (!isWhiteSpace) fragment += c;
@@ -70,7 +70,8 @@ namespace Trax
                         }
                         break;
                     case EventStates.Type:
-                        if (isWhiteSpace) {
+                        if (!isWhiteSpace) fragment += c;
+                        if (isEnd) {
                             if (Type == EventTypes.UpdateValues) {
                                 Type = Tools.GetEventTypeFromString(fragment);
                                 state = EventStates.Value;
@@ -83,7 +84,6 @@ namespace Trax
                             }
                             fragment = "";
                         }
-                        else fragment += c;
                         break;
                     case EventStates.Comment:
                         if (isEndLine) { state = states.Pop(); fragment = ""; }

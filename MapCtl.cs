@@ -444,16 +444,17 @@ namespace Trax {
                     e.Graphics.DrawString(indexD.ToString(), Font, brush, d1);
                 }
                 // Track info:
-                var infoHeaderPosition = new PointF(Width - CharSize.Width * 60, Height - CharSize.Height * 8);
-                var infoPosition = new PointF(Width - CharSize.Width * 60, Height - CharSize.Height * 7);
+                var ln_no = 0;
                 var events = new StringBuilder();
-                if (track.Event0 != null) { events.Append("Event0 = "); foreach(var ev in track.Event0) events.Append(ev); events.AppendLine(); }
-                if (track.Event1 != null) { events.Append("Event1 = "); foreach (var ev in track.Event1) events.Append(ev); events.AppendLine(); }
-                if (track.Event2 != null) { events.Append("Event2 = "); foreach (var ev in track.Event2) events.Append(ev); events.AppendLine(); }
-                if (track.Eventall0 != null) { events.Append("Eventall0 = "); foreach (var ev in track.Eventall0) events.Append(ev); events.AppendLine(); }
-                if (track.Eventall1 != null) { events.Append("Eventall1 = "); foreach (var ev in track.Eventall1) events.Append(ev); events.AppendLine(); }
-                if (track.Eventall2 != null) { events.Append("Eventall2 = "); foreach (var ev in track.Eventall2) events.Append(ev); events.AppendLine(); }
-                if (track.Velocity != null) { events.Append("Velocity = "); events.AppendLine(track.Velocity.ToString()); }
+                if (track.Event0.Count > 0) { events.Append("Event0 = "); foreach(var ev in track.Event0) events.Append(ev); events.AppendLine(); ln_no++; }
+                if (track.Event1.Count > 0) { events.Append("Event1 = "); foreach (var ev in track.Event1) events.Append(ev); events.AppendLine(); ln_no++; }
+                if (track.Event2.Count > 0) { events.Append("Event2 = "); foreach (var ev in track.Event2) events.Append(ev); events.AppendLine(); ln_no++; }
+                if (track.Eventall0.Count > 0) { events.Append("Eventall0 = "); foreach (var ev in track.Eventall0) events.Append(ev); events.AppendLine(); ln_no++; }
+                if (track.Eventall1.Count > 0) { events.Append("Eventall1 = "); foreach (var ev in track.Eventall1) events.Append(ev); events.AppendLine(); ln_no++; }
+                if (track.Eventall2.Count > 0) { events.Append("Eventall2 = "); foreach (var ev in track.Eventall2) events.Append(ev); events.AppendLine(); ln_no++; }
+                if (track.Velocity != null) { events.Append("Velocity = "); events.AppendLine(track.Velocity.ToString()); ln_no++; }
+                var infoHeaderPosition = new PointF(Width - CharSize.Width * 60, Height - CharSize.Height * (ln_no + 5));
+                var infoPosition = new PointF(Width - CharSize.Width * 60, Height - CharSize.Height * (ln_no + 4));
                 var bold = new Font(Font, FontStyle.Bold);
                 var header = Messages.TrackSelected;
                 var info = String.Format(
