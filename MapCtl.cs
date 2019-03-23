@@ -51,7 +51,8 @@ namespace Trax {
         public bool ShowDots { get; set; }
         [Category("Appearance")]
         public bool ShowWidth { get; set; }
-
+        [Category("Appearance")]
+        public bool ShowSignals { get; set; }
         #endregion
 
         #region State

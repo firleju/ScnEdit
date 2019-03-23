@@ -34,14 +34,15 @@
             this.PositionXLabel = new System.Windows.Forms.ToolStripLabel();
             this.PositionLabel = new System.Windows.Forms.ToolStripLabel();
             this.ScaleLabel = new System.Windows.Forms.ToolStripLabel();
+            this.FindBox = new System.Windows.Forms.ToolStripTextBox();
             this.ScaleLabelTitle = new System.Windows.Forms.ToolStripLabel();
             this.ResetViewButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.ShowGridButton = new System.Windows.Forms.ToolStripButton();
             this.ShowDotsButton = new System.Windows.Forms.ToolStripButton();
             this.FindButton = new System.Windows.Forms.ToolStripButton();
-            this.FindBox = new System.Windows.Forms.ToolStripTextBox();
             this.ShowWidthButton = new System.Windows.Forms.ToolStripButton();
+            this.ShowSignalsButton = new System.Windows.Forms.ToolStripButton();
             this.Ctl = new Trax.MapCtl();
             this.MapToolStrip.SuspendLayout();
             this.SuspendLayout();
@@ -59,13 +60,14 @@
             this.PositionLabel,
             this.ScaleLabel,
             this.ScaleLabelTitle,
+            this.FindButton,
+            this.FindBox,
             this.ResetViewButton,
             this.toolStripSeparator1,
             this.ShowGridButton,
             this.ShowDotsButton,
-            this.FindButton,
-            this.FindBox,
-            this.ShowWidthButton});
+            this.ShowWidthButton,
+            this.ShowSignalsButton});
             resources.ApplyResources(this.MapToolStrip, "MapToolStrip");
             this.MapToolStrip.Name = "MapToolStrip";
             // 
@@ -123,6 +125,13 @@
             this.ScaleLabel.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
             this.ScaleLabel.Name = "ScaleLabel";
             // 
+            // FindBox
+            // 
+            this.FindBox.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            resources.ApplyResources(this.FindBox, "FindBox");
+            this.FindBox.Name = "FindBox";
+            this.FindBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.FindBox_KeyUp);
+            // 
             // ScaleLabelTitle
             // 
             this.ScaleLabelTitle.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
@@ -163,19 +172,20 @@
             this.FindButton.Name = "FindButton";
             this.FindButton.Click += new System.EventHandler(this.FindButton_Click);
             // 
-            // FindBox
-            // 
-            this.FindBox.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            resources.ApplyResources(this.FindBox, "FindBox");
-            this.FindBox.Name = "FindBox";
-            this.FindBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.FindBox_KeyUp);
-            // 
             // ShowWidthButton
             // 
             this.ShowWidthButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             resources.ApplyResources(this.ShowWidthButton, "ShowWidthButton");
             this.ShowWidthButton.Name = "ShowWidthButton";
             this.ShowWidthButton.Click += new System.EventHandler(this.ShowWidthButton_Click);
+            // 
+            // ShowSignalsButton
+            // 
+            this.ShowSignalsButton.CheckOnClick = true;
+            this.ShowSignalsButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            resources.ApplyResources(this.ShowSignalsButton, "ShowSignalsButton");
+            this.ShowSignalsButton.Name = "ShowSignalsButton";
+            this.ShowSignalsButton.Click += new System.EventHandler(this.ShowSignalsButton_Click);
             // 
             // Ctl
             // 
@@ -193,6 +203,7 @@
             this.Ctl.SelectedTrackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(34)))), ((int)(((byte)(0)))));
             this.Ctl.ShowDots = false;
             this.Ctl.ShowGrid = true;
+            this.Ctl.ShowSignals = false;
             this.Ctl.ShowWidth = false;
             this.Ctl.SwitchColor = System.Drawing.Color.Black;
             this.Ctl.TrackColor = System.Drawing.Color.Black;
@@ -231,5 +242,6 @@
         private System.Windows.Forms.ToolStripTextBox FindBox;
         private System.Windows.Forms.ToolStripButton FindButton;
         private System.Windows.Forms.ToolStripButton ShowWidthButton;
+        private System.Windows.Forms.ToolStripButton ShowSignalsButton;
     }
 }

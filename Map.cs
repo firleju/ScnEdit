@@ -83,5 +83,10 @@ namespace Trax {
             Ctl.ShowWidth = s.Checked = c;
             Ctl.Invalidate();
         }
+
+        private void ShowSignalsButton_Click(object sender, EventArgs e) {
+            Ctl.ShowSignals = ((ToolStripButton)sender).Checked;
+            Ctl.Invalidate();
+        }
     }
 }
