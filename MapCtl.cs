@@ -554,6 +554,39 @@ namespace Trax {
         }
 
         /// <summary>
+        /// Draws signals for train ride and manouvers
+        /// </summary>
+        /// <param name="e"></param>
+        private void DrawSignals(PaintEventArgs e) {
+            //var pens = new[] {
+            //    new Pen(TrackColor),
+            //    new Pen(SwitchColor),
+            //    new Pen(RoadColor),
+            //    new Pen(RiverColor),
+            //    new Pen(CrossColor)
+            //};
+            //var dotFill = new SolidBrush(DotColor);
+            //var b = Splines.Bounds;
+            //var g = e.Graphics;
+            //var sc = CurrentScale;
+            //var xo = b.Left * sc;
+            //var yo = b.Top * sc;
+            //VisibleSplines.ForEach(s => {
+            //    var p = pens[s.T];
+            //    var w = CurrentScale * s.W * 0.5f;
+            //    var v = w / 2;
+            //    var p1 = MapToDisplay(s.A);
+            //    var p2 = MapToDisplay(s.D);
+            //    g.DrawEllipse(p, p1.X - v, p1.Y - v, w, w);
+            //    g.FillEllipse(dotFill, p1.X - v, p1.Y - v, w, w);
+            //    g.DrawEllipse(p, p2.X - v, p2.Y - v, w, w);
+            //    g.FillEllipse(dotFill, p2.X - v, p2.Y - v, w, w);
+            //});
+            //foreach (var p in pens) p.Dispose();
+            //dotFill.Dispose();
+        }
+
+        /// <summary>
         /// Draws control's message
         /// </summary>
         /// <param name="e"></param>
@@ -575,6 +608,7 @@ namespace Trax {
                 if (ShowGrid) DrawGrid(e);
                 DrawTracks(e);
                 if (ShowDots) DrawDots(e);
+                if (ShowSignals) DrawSignals(e);
                 DrawSelection(e);
             } else DrawMessage(e);
         }
