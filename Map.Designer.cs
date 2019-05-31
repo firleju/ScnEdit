@@ -34,16 +34,17 @@
             this.PositionXLabel = new System.Windows.Forms.ToolStripLabel();
             this.PositionLabel = new System.Windows.Forms.ToolStripLabel();
             this.ScaleLabel = new System.Windows.Forms.ToolStripLabel();
-            this.FindBox = new System.Windows.Forms.ToolStripTextBox();
             this.ScaleLabelTitle = new System.Windows.Forms.ToolStripLabel();
+            this.FindButton = new System.Windows.Forms.ToolStripButton();
+            this.FindBox = new System.Windows.Forms.ToolStripTextBox();
             this.ResetViewButton = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.ShowGridButton = new System.Windows.Forms.ToolStripButton();
             this.ShowDotsButton = new System.Windows.Forms.ToolStripButton();
-            this.FindButton = new System.Windows.Forms.ToolStripButton();
             this.ShowWidthButton = new System.Windows.Forms.ToolStripButton();
             this.ShowSignalsButton = new System.Windows.Forms.ToolStripButton();
             this.Ctl = new Trax.MapCtl();
+            this.ReloadButton = new System.Windows.Forms.ToolStripButton();
             this.MapToolStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -67,7 +68,8 @@
             this.ShowGridButton,
             this.ShowDotsButton,
             this.ShowWidthButton,
-            this.ShowSignalsButton});
+            this.ShowSignalsButton,
+            this.ReloadButton});
             resources.ApplyResources(this.MapToolStrip, "MapToolStrip");
             this.MapToolStrip.Name = "MapToolStrip";
             // 
@@ -125,18 +127,26 @@
             this.ScaleLabel.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
             this.ScaleLabel.Name = "ScaleLabel";
             // 
+            // ScaleLabelTitle
+            // 
+            this.ScaleLabelTitle.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            resources.ApplyResources(this.ScaleLabelTitle, "ScaleLabelTitle");
+            this.ScaleLabelTitle.Name = "ScaleLabelTitle";
+            // 
+            // FindButton
+            // 
+            this.FindButton.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.FindButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            resources.ApplyResources(this.FindButton, "FindButton");
+            this.FindButton.Name = "FindButton";
+            this.FindButton.Click += new System.EventHandler(this.FindButton_Click);
+            // 
             // FindBox
             // 
             this.FindBox.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
             resources.ApplyResources(this.FindBox, "FindBox");
             this.FindBox.Name = "FindBox";
             this.FindBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.FindBox_KeyUp);
-            // 
-            // ScaleLabelTitle
-            // 
-            this.ScaleLabelTitle.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            resources.ApplyResources(this.ScaleLabelTitle, "ScaleLabelTitle");
-            this.ScaleLabelTitle.Name = "ScaleLabelTitle";
             // 
             // ResetViewButton
             // 
@@ -163,14 +173,6 @@
             resources.ApplyResources(this.ShowDotsButton, "ShowDotsButton");
             this.ShowDotsButton.Name = "ShowDotsButton";
             this.ShowDotsButton.Click += new System.EventHandler(this.ShowDotsButton_Click);
-            // 
-            // FindButton
-            // 
-            this.FindButton.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.FindButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            resources.ApplyResources(this.FindButton, "FindButton");
-            this.FindButton.Name = "FindButton";
-            this.FindButton.Click += new System.EventHandler(this.FindButton_Click);
             // 
             // ShowWidthButton
             // 
@@ -208,6 +210,13 @@
             this.Ctl.SwitchColor = System.Drawing.Color.Black;
             this.Ctl.TrackColor = System.Drawing.Color.Black;
             // 
+            // ReloadButton
+            // 
+            this.ReloadButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            resources.ApplyResources(this.ReloadButton, "ReloadButton");
+            this.ReloadButton.Name = "ReloadButton";
+            this.ReloadButton.Click += new System.EventHandler(this.ReloadButton_Click);
+            // 
             // Map
             // 
             resources.ApplyResources(this, "$this");
@@ -243,5 +252,6 @@
         private System.Windows.Forms.ToolStripButton FindButton;
         private System.Windows.Forms.ToolStripButton ShowWidthButton;
         private System.Windows.Forms.ToolStripButton ShowSignalsButton;
+        private System.Windows.Forms.ToolStripButton ReloadButton;
     }
 }

@@ -51,6 +51,7 @@ namespace Trax {
         private List<ProjectFile> _references;
         internal static Dictionary<string, ScnEvent> EventCollection = new Dictionary<string, ScnEvent>();
         internal static Dictionary<string, ScnMemCell> MemCellCollection = new Dictionary<string, ScnMemCell>();
+        internal static ScnSignalCollection SignalCollection = new ScnSignalCollection();
         #endregion
 
         #region Properties

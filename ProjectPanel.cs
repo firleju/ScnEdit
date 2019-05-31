@@ -61,6 +61,11 @@ namespace Trax {
             Project.References.ForEach(i => AddReference(i, Root));
             Root.Expand();
             Tree.Refresh();
+            foreach (var v in ProjectFile.EventCollection.Values)
+                v.ConnectEventToMemCell(ProjectFile.MemCellCollection);
+            foreach (var v in ProjectFile.MemCellCollection.Values)
+                v.GetSpeedListFromEvents(ProjectFile.EventCollection);
+            if (Main.TrackMap != null) Main.TrackMap.ReloadButton_Click(null, null);
         }
 
         void AddReference(ProjectFile reference, TreeNode node = null) {

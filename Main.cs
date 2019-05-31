@@ -67,6 +67,7 @@ namespace Trax {
                 new EditorFile(FileToOpen);
                 if (EditorFile.MainFiles.Count > 0) EnableEdit();
                 Status.Visible = true;
+                ShowMapMenuItem_Click(sender, e);
             } else Credits.Show();
             foreach (TypeInfo t in EditorSyntax.Styles.ConfiguredColorSchemes) {
                 var i = ColorSchemeMenu.DropDownItems.Add(t.Name.Replace("Colors_", "").Replace("_", " "), null, Main_SetColorScheme) as ToolStripMenuItem;
@@ -109,7 +110,11 @@ namespace Trax {
 
         private void OpenFile_FileOk(object sender, CancelEventArgs e) {
             new EditorFile(OpenFileDialog.FileName);
-            if (EditorFile.MainFiles.Count > 0) { EnableEdit(); Status.Visible = true; }
+            if (EditorFile.MainFiles.Count > 0) {
+                EnableEdit();
+                Status.Visible = true;
+                ShowMapMenuItem_Click(sender, null);
+            }
         }
 
         public void DisableEdit(bool useWaitCursor = false) {

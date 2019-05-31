@@ -101,6 +101,8 @@ namespace Trax {
             set { if (value == null) return; Splines = new SplineCollection(value); FitScale = CurrentScale = GetFitScale(); Invalidate(); }
         }
 
+        SignalCollection Signals = new SignalCollection();
+
         [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public SelectionClass Selection { get; set; }
 
@@ -123,6 +125,13 @@ namespace Trax {
             get {
                 if (IsOutFull) return Splines;
                 return Splines.Where(s => s.HasPointIn(VisibleArea)).ToList();
+            }
+        }
+
+        private List<Signal> VisibleSignals {
+            get {
+                if (IsOutFull) return Signals;
+                return Signals.Where(s => s.HasPointIn(VisibleArea)).ToList();
             }
         }
 
@@ -187,6 +196,15 @@ namespace Trax {
         }
 
         #region Loading
+        /// <summary>
+        /// Reload all data in map based on new data in file
+        /// </summary>
+        public void Reload() {
+            FitScale = CurrentScale = 0.01f;
+            CtlCenter = new PointF(Width / 2, Height / 2);
+            Selection = new SelectionClass(this);
+            BeginLoad();
+        }
 
         /// <summary>
         /// Begins track data loading
@@ -210,6 +228,7 @@ namespace Trax {
             try {
                 if (!DesignMode) {
                     Tracks = ScnTrackCollection.Load();
+                    Signals.Load();
                     MapArea = Splines.Bounds;
                 }
                 Message = null;
@@ -1062,6 +1081,52 @@ namespace Trax {
             }
             
 
+        }
+
+
+        #endregion
+
+        #region Signals
+
+        /// <summary>
+        /// A single, 2D, floating point train signal for drawing and on screen manipulation
+        /// ALL COORDINATES ARE REVERSE TERRAIN COORDINATES
+        /// </summary>
+        class Signal
+        {
+            private PointF Point;
+            private EventTypes Type;
+            private string Name;
+            public Signal(ScnMemCell memcell) {
+                Point = memcell.Point;
+                Type = memcell.Type;
+                Name = memcell.Name;
+            }
+
+            /// <summary>
+            /// Returns true if any spline point is contained within specified rectangle
+            /// </summary>
+            /// <param name="r"></param>
+            /// <returns></returns>
+            public bool HasPointIn(RectangleF r) {
+                return r.Contains(Point);
+            }
+
+        }
+
+        /// <summary>
+        /// A list of train signals for drawing and on screen manipulation
+        /// </summary>
+        class SignalCollection : List<Signal>
+        {
+            public void Load() {
+                Clear();
+                foreach (var m in ProjectFile.MemCellCollection.Values) {
+                    if (m.Type == EventTypes.SetVelocity || m.Type == EventTypes.ShuntVelocity) {
+                        Add(new Signal(m));
+                    }
+                }
+            }
         }
 
 

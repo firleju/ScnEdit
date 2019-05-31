@@ -88,5 +88,9 @@ namespace Trax {
             Ctl.ShowSignals = ((ToolStripButton)sender).Checked;
             Ctl.Invalidate();
         }
+
+        internal void ReloadButton_Click(object sender, EventArgs e) {
+            Ctl.Reload();
+        }
     }
 }
