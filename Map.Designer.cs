@@ -43,8 +43,8 @@
             this.ShowDotsButton = new System.Windows.Forms.ToolStripButton();
             this.ShowWidthButton = new System.Windows.Forms.ToolStripButton();
             this.ShowSignalsButton = new System.Windows.Forms.ToolStripButton();
-            this.Ctl = new Trax.MapCtl();
             this.ReloadButton = new System.Windows.Forms.ToolStripButton();
+            this.Ctl = new Trax.MapCtl();
             this.MapToolStrip.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -189,6 +189,13 @@
             this.ShowSignalsButton.Name = "ShowSignalsButton";
             this.ShowSignalsButton.Click += new System.EventHandler(this.ShowSignalsButton_Click);
             // 
+            // ReloadButton
+            // 
+            this.ReloadButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            resources.ApplyResources(this.ReloadButton, "ReloadButton");
+            this.ReloadButton.Name = "ReloadButton";
+            this.ReloadButton.Click += new System.EventHandler(this.ReloadButton_Click);
+            // 
             // Ctl
             // 
             this.Ctl.BackColor = System.Drawing.Color.White;
@@ -209,13 +216,6 @@
             this.Ctl.ShowWidth = false;
             this.Ctl.SwitchColor = System.Drawing.Color.Black;
             this.Ctl.TrackColor = System.Drawing.Color.Black;
-            // 
-            // ReloadButton
-            // 
-            this.ReloadButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            resources.ApplyResources(this.ReloadButton, "ReloadButton");
-            this.ReloadButton.Name = "ReloadButton";
-            this.ReloadButton.Click += new System.EventHandler(this.ReloadButton_Click);
             // 
             // Map
             // 

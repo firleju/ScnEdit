@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing.Drawing2D;
+using EnumsNET;
 
 namespace Trax {
     
@@ -40,6 +41,8 @@ namespace Trax {
         public Color GridZeroColor { get; set; }
         [Category("Appearance")]
         public Color DotColor { get; set; }
+        [Category("Appearance")]
+        public Color SignalColor { get; set; }
 
         #endregion
 
@@ -186,6 +189,7 @@ namespace Trax {
             GridColor = ColorTranslator.FromHtml("#ddeddd");
             GridZeroColor = ColorTranslator.FromHtml("#bbcccc");
             DotColor = ColorTranslator.FromHtml("#ff2200");
+            SignalColor = ColorTranslator.FromHtml("#ffff00");
             ResizeRedraw = true;
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer, true);
             ResumeLayout();
@@ -577,6 +581,20 @@ namespace Trax {
         /// </summary>
         /// <param name="e"></param>
         private void DrawSignals(PaintEventArgs e) {
+            var pen = new Pen(SignalColor);
+            var fill = new SolidBrush(SignalColor);
+            var g = e.Graphics;
+
+            foreach (var sig in VisibleSignals) {
+                PointF[] points = new PointF[] {
+                    MapToDisplay(sig.Point.X-5,sig.Point.Y-5),
+                    MapToDisplay(sig.Point.X+5,sig.Point.Y-5),
+                    MapToDisplay(sig.Point.X,sig.Point.Y+5)
+                };
+                g.DrawPolygon(pen, points);
+                g.FillPolygon(fill, points);
+            }
+            pen.Dispose();
             //var pens = new[] {
             //    new Pen(TrackColor),
             //    new Pen(SwitchColor),
@@ -1094,13 +1112,17 @@ namespace Trax {
         /// </summary>
         class Signal
         {
-            private PointF Point;
-            private EventTypes Type;
-            private string Name;
+            public PointF Point;
+            public PrzebiegType Type;
+            public string Name;
+            private ScnMemCell MemCell;
             public Signal(ScnMemCell memcell) {
                 Point = memcell.Point;
-                Type = memcell.Type;
+                Type = memcell.Type == EventTypes.SetVelocity ?
+                        PrzebiegType.Poci¹gowy : memcell.Type == EventTypes.ShuntVelocity ? PrzebiegType.Manewrowy : PrzebiegType.Oba;
                 Name = memcell.Name;
+                MemCell = memcell;
+                AnalizaTypuSemaforaNaPodstawieTabelekPrêdkoœci();
             }
 
             /// <summary>
@@ -1110,6 +1132,26 @@ namespace Trax {
             /// <returns></returns>
             public bool HasPointIn(RectangleF r) {
                 return r.Contains(Point);
+            }
+
+            private void AnalizaTypuSemaforaNaPodstawieTabelekPrêdkoœci() {
+
+                if (MemCell.SpeedListNormal.Count > 1) {
+                    Type.CombineFlags(PrzebiegType.Poci¹gowy);
+                    if (MemCell.SpeedListNormal.ContainsKey(0d))
+                        foreach (var s in MemCell.SpeedListNormal[0]) {
+                            if (s.Key > 0d) Type.CombineFlags(PrzebiegType.Automatyczny);
+                        }
+                }
+                if (MemCell.SpeedListNormal.Count > 0 && MemCell.SpeedListShunt.Count == 0) {
+                    Type.RemoveFlags(PrzebiegType.Manewrowy);
+                    Type.CombineFlags(PrzebiegType.Poci¹gowy);
+                }
+
+                if (MemCell.SpeedListShunt.Count > 0) Type.CombineFlags(PrzebiegType.Manewrowy);
+
+                //log.Debug("Semafor {0}, typ: {1}", Name, typ_semafora.AsString());
+
             }
 
         }
