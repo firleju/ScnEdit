@@ -33,6 +33,10 @@ namespace Trax {
                 for (int i = 0; i < ProjectFile.MainFiles.Count; i++) {
                     ProjectFile.MainFiles[i].GetReferences();
                 }
+                ProjectFile.AllFiles.AddRange(ProjectFile.MainFiles);
+                for (int i = 0; i < ProjectFile.AllFiles.Count; i++) {
+                    ProjectFile.AllFiles[i].GetReferencesAll();
+                }
             });
             w.RunWorkerCompleted += new RunWorkerCompletedEventHandler((s, e) => {
                 Project.Invoke();

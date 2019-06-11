@@ -46,6 +46,9 @@ namespace Trax {
 
         public string TextCache;
         internal static Dictionary<string, string> TextCacheDictionary = new Dictionary<string, string>();
+        private static List<string> FilesWithoutEvents = new List<string>();
+        private static List<string> FilesWithoutMemCells = new List<string>();
+
         internal static List<ProjectFile> AllFiles = new List<ProjectFile>();
         internal static List<ProjectFile> MainFiles = new List<ProjectFile>();
         private List<ProjectFile> _references;
@@ -368,18 +371,20 @@ namespace Trax {
             var input = !Role.HasFlag(Roles.Description) ? new ScnSyntax.Comment().Replace(Text, "") : Text;
 
             var t = ScnMemCellCollection.Parse(ref input, FileParams);
+            if (t.Count == 0) FilesWithoutMemCells.Add(Path);
             t.ToList().ForEach(x => MemCellCollection[x.Key] = x.Value);
         }
 
         internal void GetEvents() {
             var input = !Role.HasFlag(Roles.Description) ? new ScnSyntax.Comment().Replace(Text, "") : Text;
-
+            var has_events = false;
             foreach (Match m in new ScnSyntax.EventParams().Matches(input)) {
+                has_events = true;
                 var e = new ScnEvent(m.Value, FileParams);
                 EventCollection.Add(e.Name, e);
                 //log.Trace("Type: {0}, Name: {1}", e.Type, e.Name);
             }
-
+            if (!has_events) FilesWithoutEvents.Add(Path);
         }
 
 
@@ -451,10 +456,10 @@ namespace Trax {
                 var list = m.Value.Split(delim, 2);
                 string file = list[0];
 
-                var path = ((role == Roles.Description ? BaseDirectory : SceneryDirectory) + "\\" + m.Value).Replace('/', '\\');
-                var ext = System.IO.Path.GetExtension(m.Value);
+                var path = ((role == Roles.Description ? BaseDirectory : SceneryDirectory) + "\\" + file).Replace('/', '\\');
+                var ext = System.IO.Path.GetExtension(file);
                 if (defaultExt != null && ext == "") { ext = defaultExt; path += ext; }
-                if (System.IO.File.Exists(path)) {
+                if (!FilesWithoutEvents.Contains(path) && !FilesWithoutMemCells.Contains(path) && System.IO.File.Exists(path)) {
                     if (allow != null && !allow.Contains(ext)) continue;
                     if (!ref_list.Any(p => p.Path == path) || allow_duplicates) {
                         var reference = new ProjectFile(path, role, list.Length == 2 ? list[1] : "");
@@ -462,7 +467,7 @@ namespace Trax {
                         reference.GetMemCells();
                         reference.GetEvents();
                         //reference.GetReferences(role,r,ref ref_list,allow_duplicates,ignore,allow,defaultExt);
-                   }
+                    }
                 }
             }
         }
