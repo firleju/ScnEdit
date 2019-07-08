@@ -10,7 +10,7 @@ using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 
 namespace Trax {
-    
+
     internal class ProjectFile {
 
         #region Constants and enumerations
@@ -43,6 +43,7 @@ namespace Trax {
         internal bool IsConverted;
         internal bool IsNormalized;
         internal bool IsChanged;
+        internal V3D Rotoation;
 
         public string TextCache;
         internal static Dictionary<string, string> TextCacheDictionary = new Dictionary<string, string>();
@@ -54,7 +55,9 @@ namespace Trax {
         private List<ProjectFile> _references;
         internal static Dictionary<string, ScnEvent> EventCollection = new Dictionary<string, ScnEvent>();
         internal static Dictionary<string, ScnMemCell> MemCellCollection = new Dictionary<string, ScnMemCell>();
-        internal static ScnSignalCollection SignalCollection = new ScnSignalCollection();
+
+        private static readonly IFormatProvider FP = System.Globalization.CultureInfo.InvariantCulture; // needed to have C default decimal separator
+
         #endregion
 
         #region Properties
@@ -71,7 +74,7 @@ namespace Trax {
 
         internal bool IsOpen { get { return this is EditorFile; } }
         internal bool HasHtmlEncoding { get { return Type == Types.HTML || Type == Types.CSS; } }
-        
+
         /// <summary>
         /// Encoding set default for current file type
         /// </summary>
@@ -82,7 +85,7 @@ namespace Trax {
                 return _EncodingDefault = Encoding.GetEncoding(HasHtmlEncoding ? settings.HtmlEncodingDefault : settings.EncodingDefault);
             }
         }
-        
+
         internal bool AutoDecoding {
             get {
                 if (_AutoDecodingSet) return _AutoDecoding;
@@ -144,7 +147,8 @@ namespace Trax {
             Path = path.Replace('/', '\\');
             Type = GetFileType(Path);
             char[] delim = { ' ', '\t', ';', '\r', '\n' };
-            FileParams = par.Split(delim).ToList(); if (Role == Roles.Timetable) Type = Types.Timetable;
+            FileParams = par.Split(delim).ToList();
+            if (Role == Roles.Timetable) Type = Types.Timetable;
             if (Type == Types.SceneryMain) Role = Roles.Main;
             var sceneryIndex = path.IndexOf(Properties.Settings.Default.SceneryDirectory, StringComparison.InvariantCultureIgnoreCase);
             var sceneryLength = _SceneryDirectoryName.Length;
@@ -161,8 +165,25 @@ namespace Trax {
             //    if (MainFiles == null) MainFiles = new List<ProjectFile>();
             //    MainFiles.Add(this);
             //}
+            var input = !Role.HasFlag(Roles.Description) ? new ScnSyntax.Comment().Replace(Text, "") : Text;
+            Rotoation = new V3D();
+            var m = new ScnSyntax.Rotate().Matches(input);
+            if (m.Count > 0) {
+                var s = Tools.ChangeParamsToText(m[0].Value, FileParams);
+                var l = s.Split(delim).ToList();
+                for (int i = 0; i < l.Count; i++) {
+                    double d;
+                    if (double.TryParse(l[i], System.Globalization.NumberStyles.Number, FP,out d)) {
+                        switch (i) {
+                            case 0: Rotoation.X = d; break;
+                            case 1: Rotoation.Y = d; break;
+                            case 2: Rotoation.Z = d; break;
+                        }
+                    }
+                }
+            }
         }
-
+    
         /// <summary>
         /// Opens file in editor
         /// </summary>
@@ -370,7 +391,7 @@ namespace Trax {
         internal void GetMemCells() {
             var input = !Role.HasFlag(Roles.Description) ? new ScnSyntax.Comment().Replace(Text, "") : Text;
 
-            var t = ScnMemCellCollection.Parse(ref input, FileParams);
+            var t = ScnMemCellCollection.Parse(ref input, FileParams, Rotoation);
             if (t.Count == 0) FilesWithoutMemCells.Add(Path);
             t.ToList().ForEach(x => MemCellCollection[x.Key] = x.Value);
         }
@@ -386,7 +407,6 @@ namespace Trax {
             }
             if (!has_events) FilesWithoutEvents.Add(Path);
         }
-
 
         /// <summary>
         /// Opens all project's references

@@ -23,17 +23,20 @@ namespace Trax {
         public V3D Point { get; internal set; }
         public List<ScnEvent> EventCollection { get; set; }
 
+        public double Angle { get; internal set; }
+
         public Dictionary<double, Dictionary<double, string>> SpeedListNormal { get; internal set; }
         public Dictionary<double, string> SpeedListShunt { get; internal set; }
 
         #endregion
 
-        public ScnMemCell(ScnNodeLexer.Node node, List<string> param_list) {
+        public ScnMemCell(ScnNodeLexer.Node node, List<string> param_list, V3D rotation) {
             Point = new V3D();
             EventCollection = new List<ScnEvent>();
             SpeedListNormal = new Dictionary<double, Dictionary<double, string>>();
             SpeedListShunt = new Dictionary<double, string>();
             int block = 0;
+            Angle = rotation.Y;
             Name = Tools.ChangeParamsToText(node.Name, param_list);
                 foreach (var value in node.Values) {
                 try {
@@ -104,13 +107,13 @@ namespace Trax {
         private static NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
 
 
-        public static ScnMemCellCollection Parse(ref string text, List<string> param_list) {
+        public static ScnMemCellCollection Parse(ref string text, List<string> param_list, V3D rotation) {
             var cells = new ScnMemCellCollection();
             try {
                 var lexer = new ScnNodeLexer(text, "memcell");
                 if (lexer.Nodes != null)
                     foreach (var node in lexer.Nodes) {
-                        var m = new ScnMemCell(node, param_list);
+                        var m = new ScnMemCell(node, param_list, rotation);
                         cells.Add(m.Name, m);
                         log.Trace("memcell, type {0}, name {1} params {2}", m.Type, m.Name, param_list);
                     }

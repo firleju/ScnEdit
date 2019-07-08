@@ -189,7 +189,8 @@ namespace Trax {
             GridColor = ColorTranslator.FromHtml("#ddeddd");
             GridZeroColor = ColorTranslator.FromHtml("#bbcccc");
             DotColor = ColorTranslator.FromHtml("#ff2200");
-            SignalColor = ColorTranslator.FromHtml("#ffff00");
+            // SignalColor = ColorTranslator.FromHtml("#ffff00");
+            SignalColor = Color.DeepSkyBlue;
             ResizeRedraw = true;
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer, true);
             ResumeLayout();
@@ -215,6 +216,7 @@ namespace Trax {
         /// </summary>
         private void BeginLoad() {
             Enabled = false;
+            if (Tracks != null) Tracks.Clear();
             Message = "Loading data...";
             using (var w = new BackgroundWorker()) {
                 w.DoWork += Load;
@@ -234,6 +236,8 @@ namespace Trax {
                     Tracks = ScnTrackCollection.Load();
                     Signals.Load();
                     MapArea = Splines.Bounds;
+                    ConnectTrackToSignal();
+                    CorrectPositionOfSignals();
                 }
                 Message = null;
             } catch (Exception x) {
@@ -251,6 +255,53 @@ namespace Trax {
                 Enabled = true;
                 ResetView();
                 if (Loaded != null) Loaded.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        private void ConnectTrackToSignal() {
+            Splines.ForEach(s => {
+                var t = s.Track;
+                CheckEventsInTrack(t.Event1,s,1);
+                CheckEventsInTrack(t.Event2,s,2);
+            });
+
+        }
+
+        private void CheckEventsInTrack(List<string> ev_arr, Spline s, int dir) {
+            foreach (var e in ev_arr) {
+                if (ProjectFile.EventCollection.TryGetValue(e, out var ev))
+                    foreach (var sig in Signals) {
+                        if (ev.MemCell == sig.MemCell) {
+                            sig.Track_spline = s;
+                            sig.Track_dir = dir;
+                        }
+                    }
+            }
+        }
+
+        private void CorrectPositionOfSignals() {
+            foreach (var s in Signals) {
+                V2D vec = new V2D();
+                switch (s.Track_dir) {
+                    case 1:
+                        s.Point = s.Track_spline.A;
+                        vec = (V2D)s.Track_spline.B - (V2D)s.Track_spline.A;
+                        if (vec.Length == 0) {
+                            vec = (V2D)s.Track_spline.D - (V2D)s.Track_spline.A;
+                        }
+                        break;
+                    case 2:
+                        s.Point = s.Track_spline.D;
+                        vec = (V2D)s.Track_spline.C - (V2D)s.Track_spline.D;
+                        if (vec.Length == 0) {
+                            vec = (V2D)s.Track_spline.A - (V2D)s.Track_spline.D;
+                        }
+                        break;
+                }
+                if (s.Track_dir > 0)
+                    s.Look_angle = (float)Tools.RadianToDegree(Math.Atan2(vec.Y, vec.X));
+                else
+                    s.Look_angle = 90f - s.Look_angle;
             }
         }
 
@@ -308,6 +359,17 @@ namespace Trax {
         }
 
         /// <summary>
+        /// Translates map points to display points
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        private PointF[] MapToDisplay(PointF[] p) {
+            for (int i = 0; i < p.Length; i++)
+                p[i] = MapToDisplay(p[i]);
+            return p;
+        }
+
+        /// <summary>
         /// Translates map rectangle to display rectangle
         /// </summary>
         /// <param name="r"></param>
@@ -356,6 +418,19 @@ namespace Trax {
             var sx = Bounds.Width / MapArea.Width;
             var sy = Bounds.Height / MapArea.Height;
             return new[] { sx, sy }.Min();
+        }
+
+        /// <summary>
+        /// Scales map points to display points without translation
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        private PointF[] ScaleByDisplay(PointF[] p) {
+            for (int i = 0; i < p.Length; i++) {
+                p[i].X *= T.Scale;
+                p[i].Y *= T.Scale;
+            }
+            return p;
         }
 
         #endregion
@@ -582,45 +657,54 @@ namespace Trax {
         /// <param name="e"></param>
         private void DrawSignals(PaintEventArgs e) {
             var pen = new Pen(SignalColor);
+            pen.Width = 2;
             var fill = new SolidBrush(SignalColor);
             var g = e.Graphics;
 
+            PointF[] sem_points = ScaleByDisplay(new PointF[] {new PointF( 0, 2.5f), new PointF(3, 0), new PointF(0, -2.5f)});
+            PointF[] tm_points = ScaleByDisplay(new PointF[] {new PointF(-3, 2.5f), new PointF(0, 0), new PointF(-3, -2.5f)});
             foreach (var sig in VisibleSignals) {
-                PointF[] points = new PointF[] {
-                    MapToDisplay(sig.Point.X-5,sig.Point.Y-5),
-                    MapToDisplay(sig.Point.X+5,sig.Point.Y-5),
-                    MapToDisplay(sig.Point.X,sig.Point.Y+5)
-                };
-                g.DrawPolygon(pen, points);
-                g.FillPolygon(fill, points);
+                //PointF[] points = new PointF[] {
+                //    MapToDisplay(sig.Point.X-5,sig.Point.Y-5),
+                //    MapToDisplay(sig.Point.X+5,sig.Point.Y-5),
+                //    MapToDisplay(sig.Point.X,sig.Point.Y+5)
+                //};
+                var display = MapToDisplay(sig.Point);
+                g.TranslateTransform(display.X, display.Y);
+                g.RotateTransform(sig.Look_angle);
+                if (sig.Type.HasFlag(PrzebiegType.Poci¹gowy)) {
+                    g.FillPolygon(fill, sem_points);
+                }
+                if (sig.Type.HasFlag(PrzebiegType.Manewrowy)) {
+                    g.DrawLines(pen, tm_points);
+                }
+                g.ResetTransform();
+                var a1 = new PointF(display.X + 2f, display.Y - 0.55f * CharSize.Height);
+                using (var brush = new SolidBrush(DetailTextColor)) {
+                    e.Graphics.DrawString(sig.Name, Font, brush, a1);
+                }            //var ln_no = 0;
             }
             pen.Dispose();
-            //var pens = new[] {
-            //    new Pen(TrackColor),
-            //    new Pen(SwitchColor),
-            //    new Pen(RoadColor),
-            //    new Pen(RiverColor),
-            //    new Pen(CrossColor)
-            //};
-            //var dotFill = new SolidBrush(DotColor);
-            //var b = Splines.Bounds;
-            //var g = e.Graphics;
-            //var sc = CurrentScale;
-            //var xo = b.Left * sc;
-            //var yo = b.Top * sc;
-            //VisibleSplines.ForEach(s => {
-            //    var p = pens[s.T];
-            //    var w = CurrentScale * s.W * 0.5f;
-            //    var v = w / 2;
-            //    var p1 = MapToDisplay(s.A);
-            //    var p2 = MapToDisplay(s.D);
-            //    g.DrawEllipse(p, p1.X - v, p1.Y - v, w, w);
-            //    g.FillEllipse(dotFill, p1.X - v, p1.Y - v, w, w);
-            //    g.DrawEllipse(p, p2.X - v, p2.Y - v, w, w);
-            //    g.FillEllipse(dotFill, p2.X - v, p2.Y - v, w, w);
-            //});
-            //foreach (var p in pens) p.Dispose();
-            //dotFill.Dispose();
+            //var events = new StringBuilder();
+            //if (track.Event0.Count > 0) { events.Append("Event0 = "); foreach (var ev in track.Event0) events.Append(ev); events.AppendLine(); ln_no++; }
+            //if (track.Event1.Count > 0) { events.Append("Event1 = "); foreach (var ev in track.Event1) events.Append(ev); events.AppendLine(); ln_no++; }
+            //if (track.Event2.Count > 0) { events.Append("Event2 = "); foreach (var ev in track.Event2) events.Append(ev); events.AppendLine(); ln_no++; }
+            //if (track.Eventall0.Count > 0) { events.Append("Eventall0 = "); foreach (var ev in track.Eventall0) events.Append(ev); events.AppendLine(); ln_no++; }
+            //if (track.Eventall1.Count > 0) { events.Append("Eventall1 = "); foreach (var ev in track.Eventall1) events.Append(ev); events.AppendLine(); ln_no++; }
+            //if (track.Eventall2.Count > 0) { events.Append("Eventall2 = "); foreach (var ev in track.Eventall2) events.Append(ev); events.AppendLine(); ln_no++; }
+            //if (track.Velocity != null) { events.Append("Velocity = "); events.AppendLine(track.Velocity.ToString()); ln_no++; }
+            //var infoHeaderPosition = new PointF(Width - CharSize.Width * 60, Height - CharSize.Height * (ln_no + 5));
+            //var infoPosition = new PointF(Width - CharSize.Width * 60, Height - CharSize.Height * (ln_no + 4));
+            //var bold = new Font(Font, FontStyle.Bold);
+            //var header = Messages.TrackSelected;
+            //var info = String.Format(
+            //    Messages.TrackInfo,
+            //    track.Name ?? "none", track.SourcePath, track.SourceIndex, track.Quality, events.ToString()
+            //);
+            //using (var brush = new SolidBrush(DetailTextColor)) {
+            //    e.Graphics.DrawString(header, bold, brush, infoHeaderPosition);
+            //    e.Graphics.DrawString(info, Font, brush, infoPosition);
+            //}
         }
 
         /// <summary>
@@ -1033,6 +1117,7 @@ namespace Trax {
                 var tc = tracks.Count;
                 Capacity = (int)Math.Round(1.1 * tc, 0);
                 tracks.ForEach(t => { Add(Spline.FromTrack(t)); if (t.IsSwitch) Add(Spline.FromTrack(t, true)); });
+                tracks.FindAndSetNeighbours();
                 Tracks = tracks;
             }
 
@@ -1115,9 +1200,13 @@ namespace Trax {
             public PointF Point;
             public PrzebiegType Type;
             public string Name;
-            private ScnMemCell MemCell;
+            public ScnMemCell MemCell;
+            public Spline Track_spline; //spline near which signal stay
+            public int Track_dir; //direction in which signal look
+            public float Look_angle; //angle in which signal should be rotate
             public Signal(ScnMemCell memcell) {
                 Point = memcell.Point;
+                Look_angle = (float)memcell.Angle;
                 Type = memcell.Type == EventTypes.SetVelocity ?
                         PrzebiegType.Poci¹gowy : memcell.Type == EventTypes.ShuntVelocity ? PrzebiegType.Manewrowy : PrzebiegType.Oba;
                 Name = memcell.Name;

@@ -51,6 +51,7 @@ namespace Trax {
             EventStates state = EventStates.Scan;
             Stack<EventStates> states = new Stack<EventStates>();
             string fragment = "";
+            string param = "";
             char c;
             bool isParamStart = false, isParamEnd = false;
             bool isEnd = false;
@@ -62,24 +63,27 @@ namespace Trax {
                 isEnd = i == sourceLastIndex; // identifier is considered ended after whitespace character, comment start or end of data
                 switch (state) {
                     case EventStates.Scan:
-                        fragment += c;
                         if (isParamStart) {
+                            param += c;
                             states.Push(state);
                             state = EventStates.Parameter;
                         }
+                        else fragment += c;
                         break;
                     case EventStates.Parameter:
-                        fragment += c;
+                        param += c;
                         if (isParamEnd) {
-                            string p = fragment.Substring(fragment.IndexOf('('));
                             string n = "";
-                            foreach (char c1 in p) {
+                            foreach (char c1 in param) {
                                 if (c1 >= '0' && c1 <= '9') { n += c1; }
                             }
                             int cyf = int.Parse(n);
                             if (cyf <= parameters.Count)
-                                fragment = fragment.Replace(p, parameters[cyf - 1]);
+                                fragment += parameters[cyf - 1];
+                            else
+                                fragment += param;
                             state = states.Pop();
+                            param = "";
                         }
                         break;
 
@@ -151,6 +155,10 @@ namespace Trax {
             else if (dir.Equals("bok", CI)) return PlusDirection.Bok;
             else return PlusDirection.NoDir;
 
+        }
+
+        public static double RadianToDegree(double angle) {
+            return angle * (180.0 / Math.PI);
         }
     }
 

@@ -62,7 +62,8 @@ namespace ScnSyntax {
                 new PCR("IncludeParams", @"(?<=include)(?: (%))+?(?= end)", PcrOptions.Precompiled),
                 new PCR("IncludeWithParams", @"(?<=include )((%) )(?!end)((%) )*?(%)(?= end)", PcrOptions.Precompiled),
                 new PCR("EventParams", @"(?<=event )(% )*?(%)(?= endevent)", PcrOptions.Precompiled),
-                new PCR("TrainsetParams", @"(?<=trainset)(?: (%)){4}", PcrOptions.Precompiled)
+                new PCR("TrainsetParams", @"(?<=trainset)(?: (%)){4}", PcrOptions.Precompiled),
+                new PCR("Rotate", @"(?<=rotate )(((%) ){2}(%))", PcrOptions.Precompiled)
             };
             Regex.CompileToAssembly(syntax, new AssemblyName("ScnSyntax"));
         }
