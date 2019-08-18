@@ -12,7 +12,7 @@ namespace Trax.StyleSchemes {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "12.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.1.0.0")]
     internal sealed partial class Styles_Default : global::System.Configuration.ApplicationSettingsBase {
         
         private static Styles_Default defaultInstance = ((Styles_Default)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Styles_Default())));

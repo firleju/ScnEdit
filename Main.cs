@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
+using NetMQ;
 
 namespace Trax {
     
@@ -21,6 +22,10 @@ namespace Trax {
         internal ProjectPanel SceneryPanel;
         internal SearchResultsPanel SearchResultsPanel;
         internal Map TrackMap;
+
+        private static NLog.Logger log;
+        internal NetMQPoller NetworkPoller;
+        internal Network NetHandler;
 
         #endregion
 
@@ -47,6 +52,9 @@ namespace Trax {
         #region Core
 
         public Main(string[] args) {
+            log = NLog.LogManager.GetCurrentClassLogger();
+            log.Info("Wizualizacja danych Trax");
+            InitializeNetwork();
             InitializeComponent();
             SuspendLayout();
             //(new VS2012ToolStripExtender { VS2012Renderer = new VS2012ToolStripRenderer() }).SetEnableVS2012Style(MainMenu, true);
@@ -68,7 +76,9 @@ namespace Trax {
                 if (EditorFile.MainFiles.Count > 0) EnableEdit();
                 Status.Visible = true;
                 ShowMapMenuItem_Click(sender, e);
-            } else Credits.Show();
+                //if (System.IO.File.Exists("log.txt")) new EditorFile("log.txt", ProjectFile.Roles.Log);
+            }
+            else Credits.Show();
             foreach (TypeInfo t in EditorSyntax.Styles.ConfiguredColorSchemes) {
                 var i = ColorSchemeMenu.DropDownItems.Add(t.Name.Replace("Colors_", "").Replace("_", " "), null, Main_SetColorScheme) as ToolStripMenuItem;
                 if (t.Name == EditorSyntax.Styles.ColorScheme.GetType().Name) i.Checked = true;
@@ -114,6 +124,8 @@ namespace Trax {
                 EnableEdit();
                 Status.Visible = true;
                 ShowMapMenuItem_Click(sender, null);
+                //if (System.IO.File.Exists("log.txt")) new EditorFile("log.txt", ProjectFile.Roles.Log);
+
             }
         }
 
@@ -130,6 +142,22 @@ namespace Trax {
             Application.DoEvents();
             EditorSyntax.FullAsyncMode = true;
         }
+
+        private void InitializeNetwork() {
+            log.Info("Otwarcie połączenia sieciowego");
+
+            var socket_client = new NetMQ.Sockets.DealerSocket();
+            socket_client.Options.Identity = System.Text.Encoding.UTF8.GetBytes("Trax połączenie 1");
+            socket_client.Connect("tcp://localhost:5555");
+            NetworkPoller = new NetMQPoller { socket_client };
+            NetHandler = new Network(ref socket_client, this);
+
+            socket_client.ReceiveReady += NetHandler.HandleMessage;
+            NetworkPoller.RunAsync();
+            NetHandler.AskForScenery();
+
+        }
+
 
         #endregion
 

@@ -21,6 +21,8 @@ namespace Trax {
 
         internal enum Roles { Any, Main, Include, Timetable, Description, Log }
 
+        private static NLog.Logger log;
+
         #endregion
 
         #region Properties
@@ -143,6 +145,7 @@ namespace Trax {
         /// <param name="path">File system path</param>
         /// <param name="role">Project role</param>
         internal ProjectFile(string path, Roles role = Roles.Any, string par = "") {
+            log = NLog.LogManager.GetCurrentClassLogger();
             Role = role;
             Path = path.Replace('/', '\\');
             Type = GetFileType(Path);
@@ -403,7 +406,7 @@ namespace Trax {
                 has_events = true;
                 var e = new ScnEvent(m.Value, FileParams);
                 EventCollection.Add(e.Name, e);
-                //log.Trace("Type: {0}, Name: {1}", e.Type, e.Name);
+                log.Trace("Type: {0}, Name: {1}", e.Type, e.Name);
             }
             if (!has_events) FilesWithoutEvents.Add(Path);
         }
@@ -482,6 +485,7 @@ namespace Trax {
                 if (!FilesWithoutEvents.Contains(path) && !FilesWithoutMemCells.Contains(path) && System.IO.File.Exists(path)) {
                     if (allow != null && !allow.Contains(ext)) continue;
                     if (!ref_list.Any(p => p.Path == path) || allow_duplicates) {
+                        log.Debug("New reference: {0}", path);
                         var reference = new ProjectFile(path, role, list.Length == 2 ? list[1] : "");
                         ref_list.Add(reference);
                         reference.GetMemCells();
